@@ -316,6 +316,11 @@ function socialIconSvg(platform){
   return icons[platform] || icons.website;
 }
 
+function soundcloudEmbedUrl(scUrl){
+  return 'https://w.soundcloud.com/player/?url=' + encodeURIComponent(scUrl) +
+    '&color=%23C89B3C&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false&visual=false';
+}
+
 /* ============================================================
    RENDER FULL SITE HTML (for preview iframe + backup export)
    ============================================================ */
@@ -328,7 +333,16 @@ function renderSite(s){
   const processHtml = s.process.map((p,i)=>`<div class="process-step"><div class="num">0${i+1} / ${esc(p.title).toUpperCase()}</div><h3>${esc(p.title)}</h3><p>${esc(p.body)}</p></div>`).join('');
   const gearHtml = (s.gear||[]).map((g,i)=>`<div class="gear-row"><div class="gear-index">0${i+1}</div><div class="gear-name">${esc(g.name)}</div><div class="track-tag">${esc(g.category)}</div></div>`).join('');
   const featList = arr => arr.map(f=>`<li>${esc(f)}</li>`).join('');
-  const tracksHtml = s.tracks.map((tr,i)=>`
+  const tracksHtml = s.tracks.map((tr,i)=> tr.soundcloudUrl ? `
+      <div class="sc-track">
+        <div class="sc-track-head">
+          <div class="track-index">0${i+1}</div>
+          <div class="track-info"><div class="t-title">${esc(tr.title)}</div><div class="t-artist">${esc(tr.artist)}</div></div>
+          <div class="track-tag">${esc(tr.tag)}</div>
+        </div>
+        <div class="sc-embed"><iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay"
+          src="${soundcloudEmbedUrl(tr.soundcloudUrl)}"></iframe></div>
+      </div>` : `
       <div class="track"><div class="track-index">0${i+1}</div>
         <button class="play-btn" aria-label="Play track"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
         <div class="track-info"><div class="t-title">${esc(tr.title)}</div><div class="t-artist">${esc(tr.artist)}</div></div>
@@ -409,6 +423,10 @@ function renderSite(s){
   .track-tag{ font-family:${fam(t.monoFont,'monospace')}; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--bronze); border:1px solid var(--line); padding:5px 10px; justify-self:start; }
   .track-dur{ font-family:${fam(t.monoFont,'monospace')}; font-size:13px; color:var(--cream-dim); text-align:right; }
   .catalog-note{ margin-top:26px; font-size:13px; color:var(--cream-dim); font-style:italic; }
+  .sc-track{ padding:22px 0; border-bottom:1px solid var(--line); }
+  .sc-track-head{ display:grid; grid-template-columns:44px 1fr auto; align-items:center; gap:20px; margin-bottom:14px; }
+  .sc-embed{ border-radius:2px; overflow:hidden; border:1px solid var(--line); }
+  .sc-embed iframe{ display:block; border:none; }
   .gear-list{ margin-top:54px; border-top:1px solid var(--line); }
   .gear-row{ display:grid; grid-template-columns:44px 1fr auto; align-items:center; gap:20px; padding:20px 0; border-bottom:1px solid var(--line); }
   .gear-index{ font-family:${fam(t.monoFont,'monospace')}; color:var(--cream-dim); font-size:13px; }
@@ -527,11 +545,13 @@ function renderTracksPanel(){
   el.innerHTML = state.tracks.map((tr,i) => `<div class="item-card"><button class="remove" data-i="${i}" data-action="removeTrack">×</button>
     <div class="field"><label>Title</label><input type="text" data-i="${i}" data-f="title" class="tr-f"></div>
     <div class="row2"><div class="field"><label>Artist label</label><input type="text" data-i="${i}" data-f="artist" class="tr-f"></div><div class="field"><label>Tag</label><input type="text" data-i="${i}" data-f="tag" class="tr-f"></div></div>
-    <div class="row2"><div class="field"><label>Duration</label><input type="text" data-i="${i}" data-f="duration" class="tr-f"></div><div class="field"><label>Audio URL</label><input type="text" data-i="${i}" data-f="audioUrl" class="tr-f"></div></div>
+    <div class="row2"><div class="field"><label>Duration</label><input type="text" data-i="${i}" data-f="duration" class="tr-f"></div><div class="field"><label>Direct audio URL (optional)</label><input type="text" data-i="${i}" data-f="audioUrl" class="tr-f"></div></div>
+    <div class="field"><label>SoundCloud track URL (optional)</label><input type="text" data-i="${i}" data-f="soundcloudUrl" class="tr-f" placeholder="https://soundcloud.com/you/track-name"></div>
+    <div class="hint">If a SoundCloud URL is set, it replaces the play button with a real embedded SoundCloud player.</div>
     </div>`).join('') + `<button class="btn add-btn" id="addTrack">+ Add track</button>`;
-  el.querySelectorAll('.tr-f').forEach(inp => { inp.value = state.tracks[inp.dataset.i][inp.dataset.f]; inp.addEventListener('input', () => { state.tracks[inp.dataset.i][inp.dataset.f] = inp.value; refresh(); }); });
+  el.querySelectorAll('.tr-f').forEach(inp => { inp.value = state.tracks[inp.dataset.i][inp.dataset.f] || ''; inp.addEventListener('input', () => { state.tracks[inp.dataset.i][inp.dataset.f] = inp.value; refresh(); }); });
   el.querySelectorAll('[data-action=removeTrack]').forEach(b => b.addEventListener('click', () => { state.tracks.splice(b.dataset.i,1); renderTracksPanel(); refresh(); }));
-  document.getElementById('addTrack').addEventListener('click', () => { state.tracks.push({ title:"New Track", artist:"Produced by Goldbear", tag:"Original", duration:"0:00", audioUrl:"" }); renderTracksPanel(); refresh(); });
+  document.getElementById('addTrack').addEventListener('click', () => { state.tracks.push({ title:"New Track", artist:"Produced by Goldbear", tag:"Original", duration:"0:00", audioUrl:"", soundcloudUrl:"" }); renderTracksPanel(); refresh(); });
 }
 function renderArtistsPanel(){
   const el = document.getElementById('artistsPanel');
