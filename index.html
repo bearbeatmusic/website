@@ -93,6 +93,10 @@
   .track-tag{ font-family:var(--font-mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--bronze); border:1px solid var(--line); padding:5px 10px; justify-self:start; }
   .track-dur{ font-family:var(--font-mono); font-size:13px; color:var(--cream-dim); text-align:right; }
   .catalog-note{ margin-top:26px; font-size:13px; color:var(--cream-dim); font-style:italic; }
+  .sc-track{ padding:22px 0; border-bottom:1px solid var(--line); }
+  .sc-track-head{ display:grid; grid-template-columns:44px 1fr auto; align-items:center; gap:20px; margin-bottom:14px; }
+  .sc-embed{ border-radius:2px; overflow:hidden; border:1px solid var(--line); }
+  .sc-embed iframe{ display:block; border:none; }
   .gear-list{ margin-top:54px; border-top:1px solid var(--line); }
   .gear-row{ display:grid; grid-template-columns:44px 1fr auto; align-items:center; gap:20px; padding:20px 0; border-bottom:1px solid var(--line); }
   .gear-index{ font-family:var(--font-mono); color:var(--cream-dim); font-size:13px; }
@@ -345,6 +349,31 @@
     return icons[platform] || icons.website;
   }
 
+  function soundcloudEmbedUrl(scUrl){
+    return 'https://w.soundcloud.com/player/?url=' + encodeURIComponent(scUrl) +
+      '&color=%23C89B3C&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false&visual=false';
+  }
+  function renderTrackRow(tr, i){
+    if (tr.soundcloudUrl) {
+      return `<div class="sc-track">
+        <div class="sc-track-head">
+          <div class="track-index">0${i+1}</div>
+          <div class="track-info"><div class="t-title">${esc(tr.title)}</div><div class="t-artist">${esc(tr.artist)}</div></div>
+          <div class="track-tag">${esc(tr.tag)}</div>
+        </div>
+        <div class="sc-embed"><iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay"
+          src="${soundcloudEmbedUrl(tr.soundcloudUrl)}"></iframe></div>
+      </div>`;
+    }
+    return `<div class="track">
+        <div class="track-index">0${i+1}</div>
+        <button class="play-btn" aria-label="Play track"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+        <div class="track-info"><div class="t-title">${esc(tr.title)}</div><div class="t-artist">${esc(tr.artist)}</div></div>
+        <div class="track-tag">${esc(tr.tag)}</div><div class="track-dur">${esc(tr.duration)}</div>
+        <audio src="${esc(tr.audioUrl)}"></audio>
+      </div>`;
+  }
+
   function applyState(s){
     if (!s) return;
     const t = s.theme || {};
@@ -433,14 +462,7 @@
     }
 
     if (Array.isArray(s.tracks)) {
-      document.getElementById('tracks-container').innerHTML = s.tracks.map((tr,i) => `
-        <div class="track">
-          <div class="track-index">0${i+1}</div>
-          <button class="play-btn" aria-label="Play track"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
-          <div class="track-info"><div class="t-title">${esc(tr.title)}</div><div class="t-artist">${esc(tr.artist)}</div></div>
-          <div class="track-tag">${esc(tr.tag)}</div><div class="track-dur">${esc(tr.duration)}</div>
-          <audio src="${esc(tr.audioUrl)}"></audio>
-        </div>`).join('');
+      document.getElementById('tracks-container').innerHTML = s.tracks.map((tr,i) => renderTrackRow(tr, i)).join('');
       wireTrackButtons();
     }
 
