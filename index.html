@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Goldbear Productions — Independent Artist Incubator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,500&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #14110D;
+    --bg-panel: #1C1712;
+    --bg-panel-2: #221B14;
+    --gold: #C89B3C;
+    --gold-bright: #E8C468;
+    --bronze: #8B5A2B;
+    --cream: #F2EBDD;
+    --cream-dim: #B9AE9B;
+    --line: rgba(242,235,221,0.12);
+    --shadow: 0 20px 60px rgba(0,0,0,0.45);
+    --radius: 2px;
+  }
+
+  *{ box-sizing: border-box; margin:0; padding:0; }
+  html{ scroll-behavior: smooth; }
+  body{
+    background: var(--bg);
+    color: var(--cream);
+    font-family: 'Manrope', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  ::selection{ background: var(--gold); color: #14110D; }
+
+  h1,h2,h3,h4{
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.05;
+  }
+
+  .eyebrow{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .eyebrow::before{
+    content: '';
+    width: 24px;
+    height: 1px;
+    background: var(--gold);
+    display: inline-block;
+  }
+
+  a{ color: inherit; text-decoration: none; }
+  .wrap{ max-width: 1160px; margin: 0 auto; padding: 0 32px; }
+
+  /* ---------- CLAW / EQ SIGNATURE ---------- */
+  .claw{
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 40px;
+  }
+  .claw span{
+    width: 4px;
+    background: linear-gradient(180deg, var(--gold-bright), var(--bronze));
+    border-radius: 2px;
+    transform: skewX(-12deg);
+    animation: clawpulse 1.8s ease-in-out infinite;
+  }
+  .claw span:nth-child(1){ height: 40%; animation-delay: 0s; }
+  .claw span:nth-child(2){ height: 100%; animation-delay: .15s; }
+  .claw span:nth-child(3){ height: 65%; animation-delay: .3s; }
+  .claw span:nth-child(4){ height: 85%; animation-delay: .45s; }
+  .claw span:nth-child(5){ height: 50%; animation-delay: .6s; }
+  @keyframes clawpulse{
+    0%, 100%{ transform: skewX(-12deg) scaleY(0.55); opacity: .75; }
+    50%{ transform: skewX(-12deg) scaleY(1); opacity: 1; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .claw span{ animation: none; }
+  }
+
+  .scratch-divider{
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    padding: 64px 0;
+  }
+  .scratch-divider span{
+    width: 2px;
+    height: 26px;
+    background: var(--bronze);
+    transform: skewX(-18deg);
+  }
+  .scratch-divider span:nth-child(2){ background: var(--gold); height: 34px; }
+
+  /* ---------- NAV ---------- */
+  header{
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 22px 0;
+    transition: background .3s ease, padding .3s ease, border-color .3s ease;
+    border-bottom: 1px solid transparent;
+  }
+  header.scrolled{
+    background: rgba(20,17,13,0.92);
+    backdrop-filter: blur(10px);
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  nav.wrap{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo{
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: 0.01em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .logo .mark{
+    width: 10px; height: 10px;
+    background: var(--gold);
+    transform: rotate(45deg);
+    display: inline-block;
+  }
+  .navlinks{
+    display: flex;
+    gap: 36px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--cream-dim);
+  }
+  .navlinks a:hover{ color: var(--gold-bright); }
+  .nav-cta{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border: 1px solid var(--gold);
+    color: var(--gold-bright);
+    padding: 10px 18px;
+  }
+  .nav-cta:hover{ background: var(--gold); color: #14110D; }
+  .navlinks-mobile{ display:none; }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding-top: 120px;
+    padding-bottom: 80px;
+    background:
+      radial-gradient(ellipse 60% 50% at 85% 15%, rgba(200,155,60,0.12), transparent 60%),
+      var(--bg);
+  }
+  .hero-inner{
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 60px;
+    align-items: center;
+    width: 100%;
+  }
+  .hero h1{
+    font-size: clamp(40px, 5.2vw, 74px);
+    color: var(--cream);
+  }
+  .hero h1 em{
+    font-style: italic;
+    color: var(--gold-bright);
+    font-weight: 500;
+  }
+  .hero p.lede{
+    margin-top: 26px;
+    font-size: 18px;
+    color: var(--cream-dim);
+    max-width: 480px;
+  }
+  .hero-ctas{
+    display: flex;
+    gap: 16px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+  }
+  .btn{
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px 26px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border-radius: var(--radius);
+  }
+  .btn-primary{
+    background: linear-gradient(135deg, var(--gold-bright), var(--gold));
+    color: #14110D;
+    font-weight: 600;
+  }
+  .btn-primary:hover{ filter: brightness(1.08); }
+  .btn-outline{
+    border: 1px solid var(--line);
+    color: var(--cream);
+  }
+  .btn-outline:hover{ border-color: var(--gold); color: var(--gold-bright); }
+
+  .hero-visual{
+    position: relative;
+    height: 420px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .hero-eq{
+    display: flex;
+    align-items: flex-end;
+    gap: 14px;
+    height: 280px;
+    transform: skewX(-10deg);
+  }
+  .hero-eq span{
+    width: 20px;
+    background: linear-gradient(180deg, var(--gold-bright), var(--bronze) 85%);
+    border-radius: 3px 3px 0 0;
+    animation: eqmove 2.4s ease-in-out infinite;
+    box-shadow: 0 0 30px rgba(200,155,60,0.15);
+  }
+  .hero-eq span:nth-child(1){ height: 35%; animation-delay: 0s; }
+  .hero-eq span:nth-child(2){ height: 70%; animation-delay: .2s; }
+  .hero-eq span:nth-child(3){ height: 100%; animation-delay: .4s; }
+  .hero-eq span:nth-child(4){ height: 55%; animation-delay: .6s; }
+  .hero-eq span:nth-child(5){ height: 82%; animation-delay: .8s; }
+  .hero-eq span:nth-child(6){ height: 45%; animation-delay: 1s; }
+  @keyframes eqmove{
+    0%, 100%{ transform: scaleY(0.5); opacity: .7; }
+    50%{ transform: scaleY(1); opacity: 1; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .hero-eq span{ animation: none; }
+  }
+
+  section{ padding: 110px 0; position: relative; }
+
+  /* ---------- ABOUT ---------- */
+  .about-head{ max-width: 640px; }
+  .about-head h2{ font-size: clamp(30px, 3.6vw, 46px); }
+  .about-head p{ margin-top: 20px; color: var(--cream-dim); font-size: 17px; max-width: 560px; }
+
+  .process{
+    margin-top: 70px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+  }
+  .process-step{
+    background: var(--bg);
+    padding: 40px 34px;
+  }
+  .process-step .num{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--bronze);
+    letter-spacing: 0.08em;
+  }
+  .process-step h3{
+    font-size: 24px;
+    margin: 18px 0 12px;
+    color: var(--gold-bright);
+  }
+  .process-step p{ color: var(--cream-dim); font-size: 15px; }
+
+  /* ---------- SERVICES ---------- */
+  .services{ background: var(--bg-panel); }
+  .pricing-grid{
+    margin-top: 60px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+  }
+  .price-card{
+    border: 1px solid var(--line);
+    padding: 44px 40px;
+    background: var(--bg);
+    position: relative;
+  }
+  .price-card.featured{
+    border-color: var(--gold);
+    background: linear-gradient(165deg, rgba(200,155,60,0.08), var(--bg) 60%);
+  }
+  .price-card.featured::before{
+    content: 'RECOMMENDED';
+    position: absolute;
+    top: -1px; right: -1px;
+    background: var(--gold);
+    color: #14110D;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    padding: 7px 14px;
+  }
+  .price-card .tier{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--cream-dim);
+  }
+  .price-card .amount{
+    font-family: 'Fraunces', serif;
+    font-size: 56px;
+    font-weight: 600;
+    color: var(--cream);
+    margin: 16px 0 4px;
+  }
+  .price-card .amount span{
+    font-size: 16px;
+    font-family: 'Manrope', sans-serif;
+    color: var(--cream-dim);
+    font-weight: 500;
+  }
+  .price-card .sub{ color: var(--cream-dim); font-size: 14px; margin-bottom: 30px; }
+  .price-card ul{ list-style: none; margin-bottom: 34px; }
+  .price-card li{
+    display: flex;
+    gap: 12px;
+    padding: 12px 0;
+    border-top: 1px solid var(--line);
+    font-size: 15px;
+    color: var(--cream);
+  }
+  .price-card li:first-of-type{ border-top: none; }
+  .price-card li::before{
+    content: '';
+    width: 6px; height: 6px;
+    margin-top: 8px;
+    background: var(--gold);
+    transform: rotate(45deg);
+    flex-shrink: 0;
+  }
+  .price-card .btn{ width: 100%; justify-content: center; }
+
+  /* ---------- CATALOG ---------- */
+  .catalog-head{ display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap; }
+  .track-list{ margin-top: 54px; border-top: 1px solid var(--line); }
+  .track{
+    display: grid;
+    grid-template-columns: 44px 60px 1fr auto 90px;
+    align-items: center;
+    gap: 20px;
+    padding: 22px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .track-index{
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--cream-dim);
+    font-size: 13px;
+  }
+  .play-btn{
+    width: 42px; height: 42px;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--gold-bright);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: border-color .2s ease, background .2s ease;
+    border-radius: 50%;
+  }
+  .play-btn:hover{ border-color: var(--gold); }
+  .play-btn.playing{ background: var(--gold); color: #14110D; }
+  .play-btn svg{ width: 14px; height: 14px; }
+  .track-info .t-title{ font-weight: 600; font-size: 16px; color: var(--cream); }
+  .track-info .t-artist{ font-size: 13.5px; color: var(--cream-dim); margin-top: 3px; }
+  .track-tag{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--bronze);
+    border: 1px solid var(--line);
+    padding: 5px 10px;
+    justify-self: start;
+  }
+  .track-dur{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--cream-dim);
+    text-align: right;
+  }
+  .catalog-note{
+    margin-top: 26px;
+    font-size: 13px;
+    color: var(--cream-dim);
+    font-style: italic;
+  }
+
+  /* ---------- ARTISTS ---------- */
+  .artists{ background: var(--bg-panel); }
+  .artist-grid{
+    margin-top: 60px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .artist-card{
+    border: 1px solid var(--line);
+    background: var(--bg);
+    overflow: hidden;
+  }
+  .artist-photo{
+    height: 220px;
+    background: linear-gradient(150deg, var(--bg-panel-2), var(--bg));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    border-bottom: 1px solid var(--line);
+  }
+  .artist-photo .initials{
+    font-family: 'Fraunces', serif;
+    font-size: 46px;
+    color: var(--gold);
+    opacity: 0.5;
+  }
+  .artist-body{ padding: 26px; }
+  .artist-body h3{ font-size: 21px; color: var(--cream); }
+  .artist-genre{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin: 10px 0 14px;
+  }
+  .artist-body p{ font-size: 14.5px; color: var(--cream-dim); }
+  .artist-links{ margin-top: 18px; display: flex; gap: 14px; font-size: 13px; }
+  .artist-links a{ color: var(--cream-dim); border-bottom: 1px solid transparent; }
+  .artist-links a:hover{ color: var(--gold-bright); border-color: var(--gold-bright); }
+
+  /* ---------- CONTACT ---------- */
+  .contact{ text-align: center; }
+  .contact h2{ font-size: clamp(32px, 4.4vw, 56px); max-width: 720px; margin: 0 auto; }
+  .contact p.lede{ color: var(--cream-dim); margin: 22px auto 40px; max-width: 480px; }
+  .contact-methods{
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-top: 50px;
+    flex-wrap: wrap;
+  }
+  .contact-method{ text-align: left; }
+  .contact-method .k{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .contact-method .v{ margin-top: 8px; font-size: 17px; }
+
+  footer{
+    border-top: 1px solid var(--line);
+    padding: 40px 0;
+  }
+  footer .wrap{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  footer .foot-links{ display: flex; gap: 26px; font-size: 13px; color: var(--cream-dim); }
+  footer .copyright{ font-size: 13px; color: var(--cream-dim); font-family: 'JetBrains Mono', monospace; }
+
+  @media (max-width: 900px){
+    .hero-inner{ grid-template-columns: 1fr; }
+    .hero-visual{ height: 200px; }
+    .process{ grid-template-columns: 1fr; }
+    .pricing-grid{ grid-template-columns: 1fr; }
+    .artist-grid{ grid-template-columns: 1fr 1fr; }
+    .navlinks{ display: none; }
+    .track{ grid-template-columns: 36px 48px 1fr auto; }
+    .track-dur{ display: none; }
+  }
+  @media (max-width: 560px){
+    .artist-grid{ grid-template-columns: 1fr; }
+    .wrap{ padding: 0 20px; }
+    .contact-methods{ flex-direction: column; align-items: center; }
+  }
+</style>
+</head>
+<body>
+
+<header id="site-header">
+  <nav class="wrap">
+    <div class="logo"><span class="mark"></span> Goldbear Productions</div>
+    <div class="navlinks">
+      <a href="#about">About</a>
+      <a href="#services">Services</a>
+      <a href="#catalog">Catalog</a>
+      <a href="#artists">Artists</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <a href="#contact" class="nav-cta">Book a session</a>
+  </nav>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="wrap hero-inner">
+    <div>
+      <div class="eyebrow">Independent Artist Incubator — Mexico City</div>
+      <h1>We produce <em>the artist</em>,<br>not just the song.</h1>
+      <p class="lede">Goldbear Productions pairs full studio production with real artist development, so every release you put your name on sounds finished — not just recorded.</p>
+      <div class="hero-ctas">
+        <a href="#services" class="btn btn-primary">See pricing</a>
+        <a href="#catalog" class="btn btn-outline">Hear the catalog</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-eq" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span><span></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ABOUT ============ -->
+<section id="about">
+  <div class="wrap">
+    <div class="about-head">
+      <div class="eyebrow">Who we are</div>
+      <h2>Built for artists who are almost there.</h2>
+      <p>Goldbear Productions is an independent incubator for musicians at the beginning of something. We're producers, engineers, and vocal coaches who work on the song and the artist behind it at the same time — because a great take means nothing if nobody knows whose it is.</p>
+    </div>
+
+    <div class="process">
+      <div class="process-step">
+        <div class="num">01 / RECORD</div>
+        <h3>Record</h3>
+        <p>In-studio sessions with a certified vocal coach on every take, so the performance is right before it's ever mixed.</p>
+      </div>
+      <div class="process-step">
+        <div class="num">02 / DEVELOP</div>
+        <h3>Develop</h3>
+        <p>Sound, image, and story worked on alongside the music. We treat your brand as part of the production, not an afterthought.</p>
+      </div>
+      <div class="process-step">
+        <div class="num">03 / RELEASE</div>
+        <h3>Release</h3>
+        <p>Every song leaves the building fully mixed and mastered — ready to put your name on and put out into the world.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="scratch-divider" aria-hidden="true"><span></span><span></span><span></span></div>
+
+<!-- ============ SERVICES ============ -->
+<section id="services" class="services">
+  <div class="wrap">
+    <div class="about-head">
+      <div class="eyebrow">What it costs</div>
+      <h2>Two ways to work with us.</h2>
+      <p>One song at a time, or ongoing — either way, you get a real studio, a real vocal coach, and real development behind every release.</p>
+    </div>
+
+    <div class="pricing-grid">
+      <div class="price-card">
+        <div class="tier">Per Song</div>
+        <div class="amount">$599</div>
+        <div class="sub">One-time · pay per track</div>
+        <ul>
+          <li>One song, fully produced from the ground up</li>
+          <li>Professional mixing &amp; mastering</li>
+          <li>Certified vocal coach present for the session</li>
+          <li>Delivered ready to release, no strings attached</li>
+        </ul>
+        <a href="#contact" class="btn btn-outline">Book a song</a>
+      </div>
+
+      <div class="price-card featured">
+        <div class="tier">Monthly Membership</div>
+        <div class="amount">$299<span>/ mo</span></div>
+        <div class="sub">Ongoing · for artists building a catalog</div>
+        <ul>
+          <li>One cover + one original song, fully mixed &amp; mastered — every two months</li>
+          <li>Certified vocal coach present for every recording session</li>
+          <li>Ongoing artistic development of your sound and direction</li>
+          <li>Full brand &amp; artist development</li>
+        </ul>
+        <a href="#contact" class="btn btn-primary">Join the roster</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CATALOG ============ -->
+<section id="catalog">
+  <div class="wrap">
+    <div class="catalog-head">
+      <div>
+        <div class="eyebrow">Produced by us</div>
+        <h2>From the studio floor.</h2>
+      </div>
+    </div>
+
+    <div class="track-list" id="track-list">
+      <!-- Each .track has a hidden <audio> tag. Replace the src="" with a path to your
+           own mp3 file (e.g. src="tracks/midnight-drive.mp3") to make playback work. -->
+      <div class="track">
+        <div class="track-index">01</div>
+        <button class="play-btn" aria-label="Play track">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <div class="track-info">
+          <div class="t-title">Midnight Drive</div>
+          <div class="t-artist">Produced by Goldbear</div>
+        </div>
+        <div class="track-tag">Original</div>
+        <div class="track-dur">3:12</div>
+        <audio src=""></audio>
+      </div>
+      <div class="track">
+        <div class="track-index">02</div>
+        <button class="play-btn" aria-label="Play track">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <div class="track-info">
+          <div class="t-title">Slow Static</div>
+          <div class="t-artist">Produced by Goldbear</div>
+        </div>
+        <div class="track-tag">Original</div>
+        <div class="track-dur">2:47</div>
+        <audio src=""></audio>
+      </div>
+      <div class="track">
+        <div class="track-index">03</div>
+        <button class="play-btn" aria-label="Play track">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <div class="track-info">
+          <div class="t-title">Golden Hour (Cover)</div>
+          <div class="t-artist">Produced by Goldbear</div>
+        </div>
+        <div class="track-tag">Cover</div>
+        <div class="track-dur">3:38</div>
+        <audio src=""></audio>
+      </div>
+      <div class="track">
+        <div class="track-index">04</div>
+        <button class="play-btn" aria-label="Play track">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        </button>
+        <div class="track-info">
+          <div class="t-title">Paper Wings</div>
+          <div class="t-artist">Produced by Goldbear</div>
+        </div>
+        <div class="track-tag">Original</div>
+        <div class="track-dur">3:05</div>
+        <audio src=""></audio>
+      </div>
+    </div>
+    <p class="catalog-note">Placeholder catalog — swap in your own titles, artists, and mp3 files to bring this to life.</p>
+  </div>
+</section>
+
+<div class="scratch-divider" aria-hidden="true"><span></span><span></span><span></span></div>
+
+<!-- ============ ARTISTS ============ -->
+<section id="artists" class="artists">
+  <div class="wrap">
+    <div class="about-head">
+      <div class="eyebrow">Current artists</div>
+      <h2>The roster right now.</h2>
+      <p>A small group of artists we're actively producing and developing. Replace these placeholders with your real roster.</p>
+    </div>
+
+    <div class="artist-grid">
+      <div class="artist-card">
+        <div class="artist-photo"><span class="initials">AR</span></div>
+        <div class="artist-body">
+          <h3>Artist One</h3>
+          <div class="artist-genre">Genre / City</div>
+          <p>One line on their sound and what they're working on right now.</p>
+          <div class="artist-links"><a href="#">Instagram</a><a href="#">Listen</a></div>
+        </div>
+      </div>
+      <div class="artist-card">
+        <div class="artist-photo"><span class="initials">BR</span></div>
+        <div class="artist-body">
+          <h3>Artist Two</h3>
+          <div class="artist-genre">Genre / City</div>
+          <p>One line on their sound and what they're working on right now.</p>
+          <div class="artist-links"><a href="#">Instagram</a><a href="#">Listen</a></div>
+        </div>
+      </div>
+      <div class="artist-card">
+        <div class="artist-photo"><span class="initials">CR</span></div>
+        <div class="artist-body">
+          <h3>Artist Three</h3>
+          <div class="artist-genre">Genre / City</div>
+          <p>One line on their sound and what they're working on right now.</p>
+          <div class="artist-links"><a href="#">Instagram</a><a href="#">Listen</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONTACT ============ -->
+<section id="contact" class="contact">
+  <div class="wrap">
+    <div class="eyebrow" style="justify-content:center;">Get started</div>
+    <h2>Ready to sound finished?</h2>
+    <p class="lede">Tell us what you're working on. We'll set up a session and take it from a demo to something you'd put your name on.</p>
+    <a href="mailto:hello@goldbearproductions.com" class="btn btn-primary">Email us</a>
+
+    <div class="contact-methods">
+      <div class="contact-method">
+        <div class="k">Email</div>
+        <div class="v">hello@goldbearproductions.com</div>
+      </div>
+      <div class="contact-method">
+        <div class="k">Instagram</div>
+        <div class="v">@goldbearproductions</div>
+      </div>
+      <div class="contact-method">
+        <div class="k">Based in</div>
+        <div class="v">Mexico City</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="logo"><span class="mark"></span> Goldbear Productions</div>
+    <div class="foot-links">
+      <a href="#about">About</a>
+      <a href="#services">Services</a>
+      <a href="#catalog">Catalog</a>
+      <a href="#artists">Artists</a>
+    </div>
+    <div class="copyright">© 2026 Goldbear Productions</div>
+  </div>
+</footer>
+
+<script>
+  // Header background on scroll
+  const header = document.getElementById('site-header');
+  window.addEventListener('scroll', () => {
+    header.classList.toggle('scrolled', window.scrollY > 40);
+  });
+
+  // Track play/pause toggling
+  document.querySelectorAll('.track').forEach(track => {
+    const btn = track.querySelector('.play-btn');
+    const audio = track.querySelector('audio');
+    btn.addEventListener('click', () => {
+      const isPlaying = btn.classList.contains('playing');
+      document.querySelectorAll('.play-btn.playing').forEach(b => {
+        b.classList.remove('playing');
+        b.closest('.track').querySelector('audio').pause();
+        b.querySelector('svg').innerHTML = '<path d="M8 5v14l11-7z"/>';
+      });
+      if (!isPlaying) {
+        if (audio.src) {
+          audio.play().catch(() => {});
+        }
+        btn.classList.add('playing');
+        btn.querySelector('svg').innerHTML = '<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>';
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
