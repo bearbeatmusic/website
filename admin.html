@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Goldbear Productions — Site Editor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --a-bg: #0F0E0C; --a-panel: #17140F; --a-panel-2: #1D1912; --a-line: rgba(242,235,221,0.10);
+    --a-gold: #C89B3C; --a-gold-bright: #E8C468; --a-text: #F2EBDD; --a-dim: #9C9284;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; height:100%; background: var(--a-bg); color: var(--a-text); font-family: 'Manrope', sans-serif; }
+
+  /* ---- Login screen ---- */
+  #login-screen{ height:100vh; display:flex; align-items:center; justify-content:center; }
+  .login-card{ width:340px; padding: 34px; border:1px solid var(--a-line); border-radius:6px; background: var(--a-panel); }
+  .login-card h1{ font-size:16px; margin:0 0 4px; }
+  .login-card p{ font-size:12.5px; color: var(--a-dim); margin:0 0 22px; }
+  .login-card input{ width:100%; margin-bottom:12px; background: var(--a-panel-2); border:1px solid var(--a-line); color: var(--a-text); padding:10px; border-radius:3px; font-size:14px; }
+  .login-card button{ width:100%; padding:11px; background: var(--a-gold); color:#0F0E0C; border:none; border-radius:3px; font-weight:700; cursor:pointer; font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.05em; text-transform:uppercase; }
+  .login-card button:hover{ background: var(--a-gold-bright); }
+  .login-error{ color:#E89A68; font-size:12.5px; margin-top:10px; min-height:16px; }
+  .login-note{ font-size:11.5px; color:var(--a-dim); margin-top:16px; line-height:1.5; }
+
+  .app{ display: none; grid-template-columns: 380px 1fr; height: 100vh; }
+  .app.visible{ display:grid; }
+
+  .sidebar{ background: var(--a-panel); border-right: 1px solid var(--a-line); overflow-y: auto; display: flex; flex-direction: column; }
+  .sidebar-head{ padding: 22px 22px 16px; border-bottom: 1px solid var(--a-line); position: sticky; top:0; background: var(--a-panel); z-index: 5; display:flex; justify-content:space-between; align-items:flex-start;}
+  .sidebar-head h1{ font-size: 16px; margin: 0 0 4px; font-weight: 700; }
+  .sidebar-head p{ margin:0; font-size: 12px; color: var(--a-dim); }
+  .signout{ font-size:11px; color: var(--a-dim); cursor:pointer; background:none; border:none; font-family:'JetBrains Mono',monospace; }
+  .signout:hover{ color:#E89A68; }
+  .sync-status{ display:flex; align-items:center; gap:8px; padding: 14px 22px; border-bottom: 1px solid var(--a-line); font-family:'JetBrains Mono',monospace; font-size:11px; color: var(--a-dim); }
+  .sync-dot{ width:7px; height:7px; border-radius:50%; background:#5FBF7A; flex-shrink:0; }
+  .sync-dot.saving{ background: var(--a-gold); }
+  .actions{ display:flex; gap:8px; padding: 14px 22px; border-bottom: 1px solid var(--a-line); flex-wrap: wrap; }
+  .btn{ font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.05em; text-transform:uppercase; padding: 9px 12px; border-radius:3px; border:1px solid var(--a-line); background: transparent; color: var(--a-text); cursor:pointer; }
+  .btn:hover{ border-color: var(--a-gold); color: var(--a-gold-bright); }
+  .btn-danger:hover{ border-color:#C86A3C; color:#E89A68; }
+
+  details{ border-bottom: 1px solid var(--a-line); }
+  summary{ padding: 16px 22px; cursor:pointer; font-size:13px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; color: var(--a-gold-bright); display:flex; justify-content:space-between; align-items:center; list-style:none;}
+  summary::-webkit-details-marker{ display:none; }
+  summary::after{ content:'+'; color: var(--a-dim); font-size:16px; }
+  details[open] summary::after{ content:'–'; }
+  .panel{ padding: 4px 22px 22px; display:flex; flex-direction:column; gap:14px; }
+
+  label{ font-size:11px; color: var(--a-dim); text-transform:uppercase; letter-spacing:.05em; display:block; margin-bottom:6px; font-family:'JetBrains Mono',monospace;}
+  .field{ display:flex; flex-direction:column; }
+  input[type=text], input[type=email], input[type=url], textarea{
+    background: var(--a-panel-2); border: 1px solid var(--a-line); color: var(--a-text);
+    padding: 9px 10px; border-radius: 3px; font-family:'Manrope',sans-serif; font-size: 13.5px; width:100%;
+  }
+  textarea{ resize: vertical; min-height: 70px; line-height:1.5; }
+  input:focus, textarea:focus{ outline:none; border-color: var(--a-gold); }
+  input[type=color]{ width:100%; height:36px; border:1px solid var(--a-line); border-radius:3px; background:none; cursor:pointer; padding:2px; }
+  .color-row{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+  .row2{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+  .hint{ font-size:11.5px; color: var(--a-dim); margin-top:-6px; }
+
+  .file-drop{ border: 1px dashed var(--a-line); border-radius: 3px; padding: 12px; text-align:center; font-size: 12px; color: var(--a-dim); cursor:pointer; }
+  .file-drop:hover{ border-color: var(--a-gold); color: var(--a-gold-bright); }
+  .thumb{ width:100%; height:90px; object-fit:cover; border-radius:3px; margin-bottom:8px; display:none; border:1px solid var(--a-line); }
+
+  .item-card{ border:1px solid var(--a-line); border-radius:4px; padding:14px; background: var(--a-panel-2); display:flex; flex-direction:column; gap:10px; position:relative; }
+  .item-card .remove{ position:absolute; top:8px; right:8px; background:none; border:none; color: var(--a-dim); cursor:pointer; font-size:16px; line-height:1; }
+  .item-card .remove:hover{ color:#E89A68; }
+  .add-btn{ align-self:flex-start; }
+
+  .preview-wrap{ display:flex; flex-direction:column; height:100vh; }
+  .preview-bar{ display:flex; align-items:center; justify-content:space-between; padding: 10px 20px; background: var(--a-panel); border-bottom: 1px solid var(--a-line); }
+  .preview-bar .label{ font-family:'JetBrains Mono',monospace; font-size:11px; color: var(--a-dim); }
+  .viewport-toggle{ display:flex; gap:6px; }
+  .viewport-toggle button{ background:none; border:1px solid var(--a-line); color: var(--a-dim); font-size:11px; font-family:'JetBrains Mono',monospace; padding:6px 10px; border-radius:3px; cursor:pointer; }
+  .viewport-toggle button.active{ border-color: var(--a-gold); color: var(--a-gold-bright); }
+  .preview-stage{ flex:1; background: #0A0908; display:flex; align-items:center; justify-content:center; overflow:auto; padding: 16px; }
+  iframe{ background:#fff; border:none; height:100%; transition: width .25s ease; }
+  iframe.desktop{ width:100%; }
+  iframe.tablet{ width:768px; height:100%; box-shadow:0 0 0 1px var(--a-line); }
+  iframe.mobile{ width:390px; height:100%; box-shadow:0 0 0 1px var(--a-line); }
+  ::-webkit-scrollbar{ width:8px; }
+  ::-webkit-scrollbar-thumb{ background:#2a251c; border-radius:4px; }
+</style>
+</head>
+<body>
+
+<!-- ===================== LOGIN ===================== -->
+<div id="login-screen">
+  <div class="login-card">
+    <h1>Goldbear Site Editor</h1>
+    <p>Sign in with your Firebase admin account to edit the live site.</p>
+    <input type="email" id="login-email" placeholder="Email">
+    <input type="password" id="login-password" placeholder="Password">
+    <button id="login-btn">Sign in</button>
+    <div class="login-error" id="login-error"></div>
+    <div class="login-note">This account is created once in your Firebase console under Authentication → Email/Password. See the setup notes for details.</div>
+  </div>
+</div>
+
+<div class="app" id="app">
+  <div class="sidebar">
+    <div class="sidebar-head">
+      <div><h1>Goldbear Site Editor</h1><p>Changes save automatically.</p></div>
+      <button class="signout" id="signout-btn">Sign out</button>
+    </div>
+    <div class="sync-status"><span class="sync-dot" id="sync-dot"></span><span id="sync-text">Synced — live on the site</span></div>
+    <div class="actions">
+      <button class="btn" id="exportBtn">Download backup .html</button>
+      <button class="btn btn-danger" id="resetBtn">Reset to defaults</button>
+    </div>
+
+    <details open>
+      <summary>Colors &amp; fonts</summary>
+      <div class="panel">
+        <div class="color-row">
+          <div class="field"><label>Background</label><input type="color" id="c_bg"></div>
+          <div class="field"><label>Panel background</label><input type="color" id="c_bgPanel"></div>
+          <div class="field"><label>Gold accent</label><input type="color" id="c_gold"></div>
+          <div class="field"><label>Gold (bright)</label><input type="color" id="c_goldBright"></div>
+          <div class="field"><label>Bronze accent</label><input type="color" id="c_bronze"></div>
+          <div class="field"><label>Text color</label><input type="color" id="c_cream"></div>
+        </div>
+        <div class="field"><label>Display font (headings)</label><input type="text" id="f_display" list="fontlist"></div>
+        <div class="field"><label>Body font</label><input type="text" id="f_body" list="fontlist"></div>
+        <div class="field"><label>Utility font (labels/mono)</label><input type="text" id="f_mono" list="fontlist2"></div>
+        <div class="hint">Type any Google Fonts name exactly (e.g. "Playfair Display", "Space Grotesk").</div>
+        <datalist id="fontlist"><option value="Fraunces"><option value="Playfair Display"><option value="DM Serif Display"><option value="Bricolage Grotesque"><option value="Manrope"><option value="Inter"><option value="Work Sans"></datalist>
+        <datalist id="fontlist2"><option value="JetBrains Mono"><option value="Space Mono"><option value="IBM Plex Mono"></datalist>
+      </div>
+    </details>
+
+    <details>
+      <summary>Logo &amp; hero image</summary>
+      <div class="panel">
+        <div class="field"><label>Logo image (optional)</label><img class="thumb" id="logoThumb"><div class="file-drop" data-target="logoImage">Click to upload logo image</div></div>
+        <div class="field"><label>Hero background image (optional)</label><img class="thumb" id="heroThumb"><div class="file-drop" data-target="heroBgImage">Click to upload hero background</div></div>
+      </div>
+    </details>
+
+    <details>
+      <summary>Hero text</summary>
+      <div class="panel">
+        <div class="field"><label>Eyebrow label</label><input type="text" id="h_eyebrow"></div>
+        <div class="field"><label>Headline</label><textarea id="h_headline"></textarea></div>
+        <div class="field"><label>Headline emphasis word(s)</label><input type="text" id="h_em"></div>
+        <div class="hint">The emphasis text is styled in italic gold, if it appears within the headline.</div>
+        <div class="field"><label>Subheading</label><textarea id="h_sub"></textarea></div>
+        <div class="row2"><div class="field"><label>Primary button</label><input type="text" id="h_cta1"></div><div class="field"><label>Secondary button</label><input type="text" id="h_cta2"></div></div>
+      </div>
+    </details>
+
+    <details>
+      <summary>About section</summary>
+      <div class="panel">
+        <div class="field"><label>Eyebrow</label><input type="text" id="a_eyebrow"></div>
+        <div class="field"><label>Heading</label><input type="text" id="a_heading"></div>
+        <div class="field"><label>Body</label><textarea id="a_body"></textarea></div>
+      </div>
+    </details>
+
+    <details><summary>Process steps</summary><div class="panel" id="processPanel"></div></details>
+
+    <details>
+      <summary>Gear &amp; tools</summary>
+      <div class="panel">
+        <div class="field"><label>Eyebrow</label><input type="text" id="g_eyebrow"></div>
+        <div class="field"><label>Heading</label><input type="text" id="g_heading"></div>
+        <div class="field"><label>Body</label><textarea id="g_body"></textarea></div>
+        <div id="gearPanel"></div>
+      </div>
+    </details>
+
+    <details>
+      <summary>Pricing</summary>
+      <div class="panel">
+        <strong style="font-size:12px;color:var(--a-gold-bright);">Per Song</strong>
+        <div class="field"><label>Price</label><input type="text" id="p1_price"></div>
+        <div class="field"><label>Subtext</label><input type="text" id="p1_sub"></div>
+        <div class="field"><label>Features (one per line)</label><textarea id="p1_features" style="min-height:110px;"></textarea></div>
+        <div class="field"><label>Button label</label><input type="text" id="p1_btn"></div>
+        <hr style="border-color:var(--a-line);width:100%;margin:6px 0;">
+        <strong style="font-size:12px;color:var(--a-gold-bright);">Monthly Membership</strong>
+        <div class="field"><label>Price</label><input type="text" id="p2_price"></div>
+        <div class="field"><label>Subtext</label><input type="text" id="p2_sub"></div>
+        <div class="field"><label>Features (one per line)</label><textarea id="p2_features" style="min-height:110px;"></textarea></div>
+        <div class="field"><label>Button label</label><input type="text" id="p2_btn"></div>
+      </div>
+    </details>
+
+    <details><summary>Catalog tracks</summary><div class="panel" id="tracksPanel"></div></details>
+    <details><summary>Current artists</summary><div class="panel" id="artistsPanel"></div></details>
+    <details><summary>Social media</summary><div class="panel" id="socialsPanel"></div></details>
+
+    <details>
+      <summary>Contact &amp; footer</summary>
+      <div class="panel">
+        <div class="field"><label>Email</label><input type="text" id="ct_email"></div>
+        <div class="field"><label>Instagram handle</label><input type="text" id="ct_instagram"></div>
+        <div class="field"><label>Location</label><input type="text" id="ct_location"></div>
+        <div class="field"><label>Footer copyright text</label><input type="text" id="ft_text"></div>
+      </div>
+    </details>
+  </div>
+
+  <div class="preview-wrap">
+    <div class="preview-bar">
+      <span class="label">Live preview — this is what visitors see right now</span>
+      <div class="viewport-toggle">
+        <button data-vp="desktop" class="active">Desktop</button>
+        <button data-vp="tablet">Tablet</button>
+        <button data-vp="mobile">Mobile</button>
+      </div>
+    </div>
+    <div class="preview-stage"><iframe id="preview" class="desktop"></iframe></div>
+  </div>
+</div>
+
+<!-- ============================================================
+     FIREBASE — paste the SAME config here and in goldbear-productions.html
+     ============================================================ -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "PASTE_YOUR_API_KEY",
+  authDomain: "bearbeatmusic-5f655.firebaseapp.com",
+  databaseURL: "https://bearbeatmusic-5f655-default-rtdb.firebaseio.com",
+  projectId: "bearbeatmusic-5f655",
+  storageBucket: "bearbeatmusic-5f655.appspot.com",
+  messagingSenderId: "PASTE_ID",
+  appId: "PASTE_APP_ID"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+const siteRef = db.ref('goldbear/site');
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const defaultState = {
+  theme: { bg:"#14110D", bgPanel:"#1C1712", bgPanel2:"#221B14", gold:"#C89B3C", goldBright:"#E8C468", bronze:"#8B5A2B",
+    cream:"#F2EBDD", creamDim:"#B9AE9B", displayFont:"Fraunces", bodyFont:"Manrope", monoFont:"JetBrains Mono", logoImage:"", heroBgImage:"" },
+  hero: { eyebrow:"Independent Artist Incubator — Mexico City", headline:"We produce the artist, not just the song.", em:"the artist",
+    sub:"Goldbear Productions pairs full studio production with real artist development, so every release you put your name on sounds finished — not just recorded.",
+    cta1:"See pricing", cta2:"Hear the catalog" },
+  about: { eyebrow:"Who we are", heading:"Built for artists who are almost there.",
+    body:"Goldbear Productions is an independent incubator for musicians at the beginning of something. We're producers, engineers, and vocal coaches who work on the song and the artist behind it at the same time — because a great take means nothing if nobody knows whose it is." },
+  process: [
+    { title:"Record", body:"In-studio sessions with a certified vocal coach on every take, so the performance is right before it's ever mixed." },
+    { title:"Develop", body:"Sound, image, and story worked on alongside the music. We treat your brand as part of the production, not an afterthought." },
+    { title:"Release", body:"Every song leaves the building fully mixed and mastered — ready to put your name on and put out into the world." }
+  ],
+  gearSection: { eyebrow:"The studio", heading:"What we record and mix with.", body:"The same hardware and software behind every session, so what you hear in the room is what you hear on the release." },
+  gear: [
+    { name:"Pro Tools", category:"Software" },
+    { name:"AKG C314", category:"Hardware" },
+    { name:"Waves Plugins", category:"Software" },
+    { name:"Auto-Tune", category:"Software" },
+    { name:"Audient iD24", category:"Hardware" },
+    { name:"Shure SM7B", category:"Hardware" }
+  ],
+  pricing: {
+    perSong: { price:"$599", sub:"One-time · pay per track", btn:"Book a song",
+      features:["One song, fully produced from the ground up","Professional mixing & mastering","Certified vocal coach present for the session","Delivered ready to release, no strings attached"] },
+    membership: { price:"$299/mo", sub:"Ongoing · for artists building a catalog", btn:"Join the roster",
+      features:["One cover + one original song, fully mixed & mastered — every two months","Certified vocal coach present for every recording session","Ongoing artistic development of your sound and direction","Full brand & artist development"] }
+  },
+  tracks: [
+    { title:"Midnight Drive", artist:"Produced by Goldbear", tag:"Original", duration:"3:12", audioUrl:"" },
+    { title:"Slow Static", artist:"Produced by Goldbear", tag:"Original", duration:"2:47", audioUrl:"" },
+    { title:"Golden Hour (Cover)", artist:"Produced by Goldbear", tag:"Cover", duration:"3:38", audioUrl:"" },
+    { title:"Paper Wings", artist:"Produced by Goldbear", tag:"Original", duration:"3:05", audioUrl:"" }
+  ],
+  artists: [
+    { name:"Artist One", genre:"Genre / City", bio:"One line on their sound and what they're working on right now.", instagram:"#", listen:"#", photo:"" },
+    { name:"Artist Two", genre:"Genre / City", bio:"One line on their sound and what they're working on right now.", instagram:"#", listen:"#", photo:"" },
+    { name:"Artist Three", genre:"Genre / City", bio:"One line on their sound and what they're working on right now.", instagram:"#", listen:"#", photo:"" }
+  ],
+  contact: { email:"hello@goldbearproductions.com", instagram:"@goldbearproductions", location:"Mexico City" },
+  socials: [
+    { platform:"instagram", url:"https://instagram.com/goldbearproductions" },
+    { platform:"tiktok", url:"https://tiktok.com/@goldbearproductions" },
+    { platform:"spotify", url:"#" }
+  ],
+  footer: { text:"© 2026 Goldbear Productions" }
+};
+
+let state = JSON.parse(JSON.stringify(defaultState));
+let saveTimer = null;
+let suppressRemoteEcho = false;
+
+function esc(str){ return (str===undefined||str===null?"":String(str)).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function fam(name, fallback){ return `'${(name||fallback).trim()}', ${fallback}`; }
+function fontsUrl(display, body, mono){
+  const list = [...new Set([display, body, mono].filter(Boolean))];
+  const fams = list.map(f => 'family=' + encodeURIComponent(f.trim()).replace(/%20/g,'+') + ':wght@300;400;500;600;700;800;900');
+  return 'https://fonts.googleapis.com/css2?' + fams.join('&') + '&display=swap';
+}
+function initials(name){ return (name||"").trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase() || "?"; }
+const SOCIAL_PLATFORMS = ["instagram","tiktok","spotify","youtube","x","facebook","website"];
+function socialIconSvg(platform){
+  const icons = {
+    instagram: '<rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor"/>',
+    tiktok: '<path d="M14 3v10.5a3.5 3.5 0 1 1-3-3.46V7a6.5 6.5 0 1 0 6 6.48V9.5a6 6 0 0 0 3.5 1.13V7.6A4.6 4.6 0 0 1 17 3.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>',
+    spotify: '<circle cx="12" cy="12" r="9.2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M7 10.2c3-1 7-.6 9.6 1" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M7.4 13.2c2.5-.8 5.8-.5 8 .8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M7.8 16c2-.6 4.6-.4 6.4.7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>',
+    youtube: '<rect x="3" y="6" width="18" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10.5 9.5l5 2.5-5 2.5z" fill="currentColor"/>',
+    x: '<path d="M5 5l14 14M19 5L5 19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+    facebook: '<circle cx="12" cy="12" r="9.2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M13.2 20v-6.4h2l.3-2.4h-2.3V9.6c0-.7.2-1.2 1.2-1.2h1.3V6.2c-.2 0-1-.1-1.9-.1-1.9 0-3.2 1.1-3.2 3.3v2h-2v2.4h2V20" fill="none" stroke="currentColor" stroke-width="1.3"/>',
+    website: '<circle cx="12" cy="12" r="9.2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M2.8 12h18.4M12 2.8c2.4 2.6 3.6 5.8 3.6 9.2s-1.2 6.6-3.6 9.2c-2.4-2.6-3.6-5.8-3.6-9.2S9.6 5.4 12 2.8z" fill="none" stroke="currentColor" stroke-width="1.3"/>'
+  };
+  return icons[platform] || icons.website;
+}
+
+/* ============================================================
+   RENDER FULL SITE HTML (for preview iframe + backup export)
+   ============================================================ */
+function renderSite(s){
+  const t = s.theme;
+  const heroStyle = t.heroBgImage
+    ? `background: linear-gradient(rgba(20,17,13,.82),rgba(20,17,13,.9)), url('${t.heroBgImage}') center/cover no-repeat;`
+    : `background: radial-gradient(ellipse 60% 50% at 85% 15%, rgba(200,155,60,0.12), transparent 60%), var(--bg);`;
+  const logoMark = t.logoImage ? `<img src="${t.logoImage}" alt="Goldbear Productions" style="height:26px;width:auto;">` : `<span class="mark"></span>`;
+  const processHtml = s.process.map((p,i)=>`<div class="process-step"><div class="num">0${i+1} / ${esc(p.title).toUpperCase()}</div><h3>${esc(p.title)}</h3><p>${esc(p.body)}</p></div>`).join('');
+  const gearHtml = (s.gear||[]).map((g,i)=>`<div class="gear-row"><div class="gear-index">0${i+1}</div><div class="gear-name">${esc(g.name)}</div><div class="track-tag">${esc(g.category)}</div></div>`).join('');
+  const featList = arr => arr.map(f=>`<li>${esc(f)}</li>`).join('');
+  const tracksHtml = s.tracks.map((tr,i)=>`
+      <div class="track"><div class="track-index">0${i+1}</div>
+        <button class="play-btn" aria-label="Play track"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+        <div class="track-info"><div class="t-title">${esc(tr.title)}</div><div class="t-artist">${esc(tr.artist)}</div></div>
+        <div class="track-tag">${esc(tr.tag)}</div><div class="track-dur">${esc(tr.duration)}</div><audio src="${esc(tr.audioUrl)}"></audio>
+      </div>`).join('');
+  const socialsHtml = (s.socials||[]).map(soc => `
+      <a class="social-btn" href="${esc(soc.url || '#')}" target="_blank" rel="noopener" aria-label="${esc(soc.platform)}">
+        <svg viewBox="0 0 24 24">${socialIconSvg(soc.platform)}</svg>
+      </a>`).join('');
+  const artistsHtml = s.artists.map(a=>`
+      <div class="artist-card"><div class="artist-photo">${a.photo ? `<img src="${a.photo}" alt="${esc(a.name)}" style="width:100%;height:100%;object-fit:cover;">` : `<span class="initials">${esc(initials(a.name))}</span>`}</div>
+        <div class="artist-body"><h3>${esc(a.name)}</h3><div class="artist-genre">${esc(a.genre)}</div><p>${esc(a.bio)}</p>
+        <div class="artist-links"><a href="${esc(a.instagram)}">Instagram</a><a href="${esc(a.listen)}">Listen</a></div></div>
+      </div>`).join('');
+
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Goldbear Productions — Independent Artist Incubator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="${fontsUrl(t.displayFont, t.bodyFont, t.monoFont)}" rel="stylesheet">
+<style>
+  :root{ --bg:${t.bg}; --bg-panel:${t.bgPanel}; --bg-panel-2:${t.bgPanel2}; --gold:${t.gold}; --gold-bright:${t.goldBright}; --bronze:${t.bronze}; --cream:${t.cream}; --cream-dim:${t.creamDim}; --line:rgba(242,235,221,0.12); --radius:2px; }
+  *{ box-sizing:border-box; margin:0; padding:0; } html{ scroll-behavior:smooth; }
+  body{ background:var(--bg); color:var(--cream); font-family:${fam(t.bodyFont,'sans-serif')}; font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  ::selection{ background:var(--gold); color:var(--bg); }
+  h1,h2,h3,h4{ font-family:${fam(t.displayFont,'serif')}; font-weight:600; letter-spacing:-0.01em; line-height:1.05; }
+  .eyebrow{ font-family:${fam(t.monoFont,'monospace')}; font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--gold); display:inline-flex; align-items:center; gap:10px; margin-bottom:20px; }
+  .eyebrow::before{ content:''; width:24px; height:1px; background:var(--gold); display:inline-block; }
+  a{ color:inherit; text-decoration:none; } .wrap{ max-width:1160px; margin:0 auto; padding:0 32px; }
+  .scratch-divider{ display:flex; justify-content:center; gap:5px; padding:64px 0; }
+  .scratch-divider span{ width:2px; height:26px; background:var(--bronze); transform:skewX(-18deg); }
+  .scratch-divider span:nth-child(2){ background:var(--gold); height:34px; }
+  header{ position:fixed; top:0; left:0; right:0; z-index:100; padding:22px 0; transition:background .3s ease,padding .3s ease,border-color .3s ease; border-bottom:1px solid transparent; }
+  header.scrolled{ background:rgba(20,17,13,0.92); backdrop-filter:blur(10px); padding:16px 0; border-bottom:1px solid var(--line); }
+  nav.wrap{ display:flex; align-items:center; justify-content:space-between; }
+  .logo{ font-family:${fam(t.displayFont,'serif')}; font-weight:700; font-size:20px; display:flex; align-items:center; gap:10px; }
+  .logo .mark{ width:10px; height:10px; background:var(--gold); transform:rotate(45deg); display:inline-block; }
+  .navlinks{ display:flex; gap:36px; font-size:14px; font-weight:500; color:var(--cream-dim); }
+  .navlinks a:hover{ color:var(--gold-bright); }
+  .nav-cta{ font-family:${fam(t.monoFont,'monospace')}; font-size:12px; letter-spacing:.08em; text-transform:uppercase; border:1px solid var(--gold); color:var(--gold-bright); padding:10px 18px; }
+  .nav-cta:hover{ background:var(--gold); color:var(--bg); }
+  .hero{ min-height:100vh; display:flex; align-items:center; position:relative; padding-top:120px; padding-bottom:80px; ${heroStyle} }
+  .hero-inner{ display:grid; grid-template-columns:1.15fr .85fr; gap:60px; align-items:center; width:100%; }
+  .hero h1{ font-size:clamp(40px,5.2vw,74px); color:var(--cream); }
+  .hero h1 em{ font-style:italic; color:var(--gold-bright); font-weight:500; }
+  .hero p.lede{ margin-top:26px; font-size:18px; color:var(--cream-dim); max-width:480px; }
+  .hero-ctas{ display:flex; gap:16px; margin-top:40px; flex-wrap:wrap; }
+  .btn{ display:inline-flex; align-items:center; gap:10px; padding:15px 26px; font-family:${fam(t.monoFont,'monospace')}; font-size:12.5px; letter-spacing:.06em; text-transform:uppercase; border-radius:var(--radius); }
+  .btn-primary{ background:linear-gradient(135deg,var(--gold-bright),var(--gold)); color:var(--bg); font-weight:600; }
+  .btn-primary:hover{ filter:brightness(1.08); } .btn-outline{ border:1px solid var(--line); color:var(--cream); }
+  .btn-outline:hover{ border-color:var(--gold); color:var(--gold-bright); }
+  .hero-visual{ position:relative; height:420px; display:flex; align-items:center; justify-content:center; }
+  .hero-eq{ display:flex; align-items:flex-end; gap:14px; height:280px; transform:skewX(-10deg); }
+  .hero-eq span{ width:20px; background:linear-gradient(180deg,var(--gold-bright),var(--bronze) 85%); border-radius:3px 3px 0 0; animation:eqmove 2.4s ease-in-out infinite; }
+  .hero-eq span:nth-child(1){ height:35%; animation-delay:0s; } .hero-eq span:nth-child(2){ height:70%; animation-delay:.2s; }
+  .hero-eq span:nth-child(3){ height:100%; animation-delay:.4s; } .hero-eq span:nth-child(4){ height:55%; animation-delay:.6s; }
+  .hero-eq span:nth-child(5){ height:82%; animation-delay:.8s; } .hero-eq span:nth-child(6){ height:45%; animation-delay:1s; }
+  @keyframes eqmove{ 0%,100%{ transform:scaleY(.5); opacity:.7;} 50%{ transform:scaleY(1); opacity:1;} }
+  section{ padding:110px 0; position:relative; } .about-head{ max-width:640px; } .about-head h2{ font-size:clamp(30px,3.6vw,46px); }
+  .about-head p{ margin-top:20px; color:var(--cream-dim); font-size:17px; max-width:560px; }
+  .process{ margin-top:70px; display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line); border:1px solid var(--line); }
+  .process-step{ background:var(--bg); padding:40px 34px; } .process-step .num{ font-family:${fam(t.monoFont,'monospace')}; font-size:13px; color:var(--bronze); letter-spacing:.08em; }
+  .process-step h3{ font-size:24px; margin:18px 0 12px; color:var(--gold-bright); } .process-step p{ color:var(--cream-dim); font-size:15px; }
+  .services{ background:var(--bg-panel); } .pricing-grid{ margin-top:60px; display:grid; grid-template-columns:1fr 1fr; gap:28px; }
+  .price-card{ border:1px solid var(--line); padding:44px 40px; background:var(--bg); position:relative; }
+  .price-card.featured{ border-color:var(--gold); background:linear-gradient(165deg,rgba(200,155,60,0.08),var(--bg) 60%); }
+  .price-card.featured::before{ content:'RECOMMENDED'; position:absolute; top:-1px; right:-1px; background:var(--gold); color:var(--bg); font-family:${fam(t.monoFont,'monospace')}; font-size:10.5px; letter-spacing:.1em; padding:7px 14px; }
+  .price-card .tier{ font-family:${fam(t.monoFont,'monospace')}; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--cream-dim); }
+  .price-card .amount{ font-family:${fam(t.displayFont,'serif')}; font-size:52px; font-weight:600; color:var(--cream); margin:16px 0 4px; }
+  .price-card .sub{ color:var(--cream-dim); font-size:14px; margin-bottom:30px; } .price-card ul{ list-style:none; margin-bottom:34px; }
+  .price-card li{ display:flex; gap:12px; padding:12px 0; border-top:1px solid var(--line); font-size:15px; color:var(--cream); } .price-card li:first-of-type{ border-top:none; }
+  .price-card li::before{ content:''; width:6px; height:6px; margin-top:8px; background:var(--gold); transform:rotate(45deg); flex-shrink:0; } .price-card .btn{ width:100%; justify-content:center; }
+  .catalog-head{ display:flex; justify-content:space-between; align-items:flex-end; gap:24px; flex-wrap:wrap; } .track-list{ margin-top:54px; border-top:1px solid var(--line); }
+  .track{ display:grid; grid-template-columns:44px 60px 1fr auto 90px; align-items:center; gap:20px; padding:22px 0; border-bottom:1px solid var(--line); }
+  .track-index{ font-family:${fam(t.monoFont,'monospace')}; color:var(--cream-dim); font-size:13px; }
+  .play-btn{ width:42px; height:42px; border:1px solid var(--line); background:transparent; color:var(--gold-bright); display:flex; align-items:center; justify-content:center; cursor:pointer; border-radius:50%; }
+  .play-btn:hover{ border-color:var(--gold); } .play-btn.playing{ background:var(--gold); color:var(--bg); } .play-btn svg{ width:14px; height:14px; }
+  .track-info .t-title{ font-weight:600; font-size:16px; color:var(--cream); } .track-info .t-artist{ font-size:13.5px; color:var(--cream-dim); margin-top:3px; }
+  .track-tag{ font-family:${fam(t.monoFont,'monospace')}; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--bronze); border:1px solid var(--line); padding:5px 10px; justify-self:start; }
+  .track-dur{ font-family:${fam(t.monoFont,'monospace')}; font-size:13px; color:var(--cream-dim); text-align:right; }
+  .catalog-note{ margin-top:26px; font-size:13px; color:var(--cream-dim); font-style:italic; }
+  .gear-list{ margin-top:54px; border-top:1px solid var(--line); }
+  .gear-row{ display:grid; grid-template-columns:44px 1fr auto; align-items:center; gap:20px; padding:20px 0; border-bottom:1px solid var(--line); }
+  .gear-index{ font-family:${fam(t.monoFont,'monospace')}; color:var(--cream-dim); font-size:13px; }
+  .gear-name{ font-weight:600; font-size:16px; color:var(--cream); }
+  .artists{ background:var(--bg-panel); } .artist-grid{ margin-top:60px; display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
+  .artist-card{ border:1px solid var(--line); background:var(--bg); overflow:hidden; }
+  .artist-photo{ height:220px; background:linear-gradient(150deg,var(--bg-panel-2),var(--bg)); display:flex; align-items:center; justify-content:center; border-bottom:1px solid var(--line); overflow:hidden; }
+  .artist-photo .initials{ font-family:${fam(t.displayFont,'serif')}; font-size:46px; color:var(--gold); opacity:.5; }
+  .artist-body{ padding:26px; } .artist-body h3{ font-size:21px; color:var(--cream); }
+  .artist-genre{ font-family:${fam(t.monoFont,'monospace')}; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--gold); margin:10px 0 14px; }
+  .artist-body p{ font-size:14.5px; color:var(--cream-dim); } .artist-links{ margin-top:18px; display:flex; gap:14px; font-size:13px; }
+  .artist-links a{ color:var(--cream-dim); border-bottom:1px solid transparent; } .artist-links a:hover{ color:var(--gold-bright); border-color:var(--gold-bright); }
+  .contact{ text-align:center; } .contact h2{ font-size:clamp(32px,4.4vw,56px); max-width:720px; margin:0 auto; }
+  .contact p.lede{ color:var(--cream-dim); margin:22px auto 40px; max-width:480px; } .contact-methods{ display:flex; justify-content:center; gap:40px; margin-top:50px; flex-wrap:wrap; }
+  .contact-method{ text-align:left; } .contact-method .k{ font-family:${fam(t.monoFont,'monospace')}; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--gold); }
+  .contact-method .v{ margin-top:8px; font-size:17px; }
+  .social-row{ display:flex; justify-content:center; gap:14px; margin-top:36px; flex-wrap:wrap; }
+  .social-btn{ width:44px; height:44px; border-radius:50%; border:1px solid var(--line); display:flex; align-items:center; justify-content:center; color:var(--cream-dim); transition:border-color .2s ease, color .2s ease; }
+  .social-btn:hover{ border-color:var(--gold); color:var(--gold-bright); }
+  .social-btn svg{ width:18px; height:18px; }
+  footer{ border-top:1px solid var(--line); padding:40px 0; }
+  footer .wrap{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; } footer .foot-links{ display:flex; gap:26px; font-size:13px; color:var(--cream-dim); }
+  footer .copyright{ font-size:13px; color:var(--cream-dim); font-family:${fam(t.monoFont,'monospace')}; }
+  @media (max-width:900px){ .hero-inner{ grid-template-columns:1fr; } .hero-visual{ height:200px; } .process{ grid-template-columns:1fr; } .pricing-grid{ grid-template-columns:1fr; } .artist-grid{ grid-template-columns:1fr 1fr; } .navlinks{ display:none; } .track{ grid-template-columns:36px 48px 1fr auto; } .track-dur{ display:none; } }
+  @media (max-width:560px){ .artist-grid{ grid-template-columns:1fr; } .wrap{ padding:0 20px; } .contact-methods{ flex-direction:column; align-items:center; } }
+</style></head><body>
+<header id="site-header"><nav class="wrap"><div class="logo">${logoMark} Goldbear Productions</div>
+<div class="navlinks"><a href="#about">About</a><a href="#services">Services</a><a href="#catalog">Catalog</a><a href="#artists">Artists</a><a href="#contact">Contact</a></div>
+<a href="#contact" class="nav-cta">Book a session</a></nav></header>
+<section class="hero"><div class="wrap hero-inner"><div>
+<div class="eyebrow">${esc(s.hero.eyebrow)}</div>
+<h1>${esc(s.hero.headline).replace(esc(s.hero.em), `<em>${esc(s.hero.em)}</em>`)}</h1>
+<p class="lede">${esc(s.hero.sub)}</p>
+<div class="hero-ctas"><a href="#services" class="btn btn-primary">${esc(s.hero.cta1)}</a><a href="#catalog" class="btn btn-outline">${esc(s.hero.cta2)}</a></div>
+</div><div class="hero-visual"><div class="hero-eq" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div></div>
+</div></section>
+<section id="about"><div class="wrap"><div class="about-head"><div class="eyebrow">${esc(s.about.eyebrow)}</div><h2>${esc(s.about.heading)}</h2><p>${esc(s.about.body)}</p></div>
+<div class="process">${processHtml}</div></div></section>
+<div class="scratch-divider" aria-hidden="true"><span></span><span></span><span></span></div>
+<section id="gear"><div class="wrap"><div class="about-head"><div class="eyebrow">${esc(s.gearSection.eyebrow)}</div><h2>${esc(s.gearSection.heading)}</h2><p>${esc(s.gearSection.body)}</p></div>
+<div class="gear-list">${gearHtml}</div></div></section>
+<div class="scratch-divider" aria-hidden="true"><span></span><span></span><span></span></div>
+<section id="services" class="services"><div class="wrap"><div class="about-head"><div class="eyebrow">What it costs</div><h2>Two ways to work with us.</h2>
+<p>One song at a time, or ongoing — either way, you get a real studio, a real vocal coach, and real development behind every release.</p></div>
+<div class="pricing-grid">
+<div class="price-card"><div class="tier">Per Song</div><div class="amount">${esc(s.pricing.perSong.price)}</div><div class="sub">${esc(s.pricing.perSong.sub)}</div>
+<ul>${featList(s.pricing.perSong.features)}</ul><a href="#contact" class="btn btn-outline">${esc(s.pricing.perSong.btn)}</a></div>
+<div class="price-card featured"><div class="tier">Monthly Membership</div><div class="amount">${esc(s.pricing.membership.price)}</div><div class="sub">${esc(s.pricing.membership.sub)}</div>
+<ul>${featList(s.pricing.membership.features)}</ul><a href="#contact" class="btn btn-primary">${esc(s.pricing.membership.btn)}</a></div>
+</div></div></section>
+<section id="catalog"><div class="wrap"><div class="catalog-head"><div><div class="eyebrow">Produced by us</div><h2>From the studio floor.</h2></div></div>
+<div class="track-list">${tracksHtml}</div><p class="catalog-note">Add audio file URLs in the editor to make playback work.</p></div></section>
+<div class="scratch-divider" aria-hidden="true"><span></span><span></span><span></span></div>
+<section id="artists" class="artists"><div class="wrap"><div class="about-head"><div class="eyebrow">Current artists</div><h2>The roster right now.</h2></div>
+<div class="artist-grid">${artistsHtml}</div></div></section>
+<section id="contact" class="contact"><div class="wrap"><div class="eyebrow" style="justify-content:center;">Get started</div><h2>Ready to sound finished?</h2>
+<p class="lede">Tell us what you're working on. We'll set up a session and take it from a demo to something you'd put your name on.</p>
+<a href="mailto:${esc(s.contact.email)}" class="btn btn-primary">Email us</a>
+<div class="contact-methods"><div class="contact-method"><div class="k">Email</div><div class="v">${esc(s.contact.email)}</div></div>
+<div class="contact-method"><div class="k">Instagram</div><div class="v">${esc(s.contact.instagram)}</div></div>
+<div class="contact-method"><div class="k">Based in</div><div class="v">${esc(s.contact.location)}</div></div></div>
+<div class="social-row">${socialsHtml}</div></div></section>
+<footer><div class="wrap"><div class="logo">${logoMark} Goldbear Productions</div>
+<div class="foot-links"><a href="#about">About</a><a href="#services">Services</a><a href="#catalog">Catalog</a><a href="#artists">Artists</a></div>
+<div class="copyright">${esc(s.footer.text)}</div></div></footer>
+<script>
+  const header = document.getElementById('site-header');
+  window.addEventListener('scroll', () => { header.classList.toggle('scrolled', window.scrollY > 40); });
+  document.querySelectorAll('.track').forEach(track => {
+    const btn = track.querySelector('.play-btn'); const audio = track.querySelector('audio');
+    btn.addEventListener('click', () => {
+      const isPlaying = btn.classList.contains('playing');
+      document.querySelectorAll('.play-btn.playing').forEach(b => { b.classList.remove('playing'); b.closest('.track').querySelector('audio').pause(); b.querySelector('svg').innerHTML = '<path d="M8 5v14l11-7z"/>'; });
+      if (!isPlaying) { if (audio.getAttribute('src')) { audio.play().catch(()=>{}); } btn.classList.add('playing'); btn.querySelector('svg').innerHTML = '<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>'; }
+    });
+  });
+<\/script></body></html>`;
+}
+
+/* ============================================================
+   AUTOSAVE TO FIREBASE (debounced) + LIVE PREVIEW
+   ============================================================ */
+function markSaving(){ document.getElementById('sync-dot').classList.add('saving'); document.getElementById('sync-text').textContent = 'Saving…'; }
+function markSynced(){ document.getElementById('sync-dot').classList.remove('saving'); document.getElementById('sync-text').textContent = 'Synced — live on the site'; }
+
+function refresh(){
+  document.getElementById('preview').srcdoc = renderSite(state);
+  markSaving();
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    suppressRemoteEcho = true;
+    siteRef.set(state).then(markSynced).catch(err => { document.getElementById('sync-text').textContent = 'Save failed — check connection'; });
+  }, 500);
+}
+
+/* ============================================================
+   BIND SIDEBAR <-> STATE  (same as before)
+   ============================================================ */
+function bindSimple(id, path){
+  const el = document.getElementById(id);
+  const get = () => path.split('.').reduce((o,k)=>o[k], state);
+  const set = (v) => { const parts = path.split('.'); let o = state; for(let i=0;i<parts.length-1;i++) o = o[parts[i]]; o[parts[parts.length-1]] = v; };
+  el.value = get();
+  el.addEventListener('input', () => { set(el.value); refresh(); });
+}
+function renderProcessPanel(){
+  const el = document.getElementById('processPanel');
+  el.innerHTML = state.process.map((p,i) => `<div class="item-card">
+    <div class="field"><label>Step ${i+1} title</label><input type="text" data-i="${i}" data-f="title" class="proc-title"></div>
+    <div class="field"><label>Step ${i+1} body</label><textarea data-i="${i}" data-f="body" class="proc-body"></textarea></div></div>`).join('');
+  el.querySelectorAll('.proc-title').forEach(inp => { inp.value = state.process[inp.dataset.i].title; inp.addEventListener('input', () => { state.process[inp.dataset.i].title = inp.value; refresh(); }); });
+  el.querySelectorAll('.proc-body').forEach(inp => { inp.value = state.process[inp.dataset.i].body; inp.addEventListener('input', () => { state.process[inp.dataset.i].body = inp.value; refresh(); }); });
+}
+function renderTracksPanel(){
+  const el = document.getElementById('tracksPanel');
+  el.innerHTML = state.tracks.map((tr,i) => `<div class="item-card"><button class="remove" data-i="${i}" data-action="removeTrack">×</button>
+    <div class="field"><label>Title</label><input type="text" data-i="${i}" data-f="title" class="tr-f"></div>
+    <div class="row2"><div class="field"><label>Artist label</label><input type="text" data-i="${i}" data-f="artist" class="tr-f"></div><div class="field"><label>Tag</label><input type="text" data-i="${i}" data-f="tag" class="tr-f"></div></div>
+    <div class="row2"><div class="field"><label>Duration</label><input type="text" data-i="${i}" data-f="duration" class="tr-f"></div><div class="field"><label>Audio URL</label><input type="text" data-i="${i}" data-f="audioUrl" class="tr-f"></div></div>
+    </div>`).join('') + `<button class="btn add-btn" id="addTrack">+ Add track</button>`;
+  el.querySelectorAll('.tr-f').forEach(inp => { inp.value = state.tracks[inp.dataset.i][inp.dataset.f]; inp.addEventListener('input', () => { state.tracks[inp.dataset.i][inp.dataset.f] = inp.value; refresh(); }); });
+  el.querySelectorAll('[data-action=removeTrack]').forEach(b => b.addEventListener('click', () => { state.tracks.splice(b.dataset.i,1); renderTracksPanel(); refresh(); }));
+  document.getElementById('addTrack').addEventListener('click', () => { state.tracks.push({ title:"New Track", artist:"Produced by Goldbear", tag:"Original", duration:"0:00", audioUrl:"" }); renderTracksPanel(); refresh(); });
+}
+function renderArtistsPanel(){
+  const el = document.getElementById('artistsPanel');
+  el.innerHTML = state.artists.map((a,i) => `<div class="item-card"><button class="remove" data-i="${i}" data-action="removeArtist">×</button>
+    <img class="thumb" id="artistThumb${i}" style="${a.photo ? 'display:block;' : ''}" src="${a.photo||''}">
+    <div class="file-drop" data-artist-photo="${i}">Click to upload photo</div>
+    <div class="field"><label>Name</label><input type="text" data-i="${i}" data-f="name" class="ar-f"></div>
+    <div class="field"><label>Genre / city</label><input type="text" data-i="${i}" data-f="genre" class="ar-f"></div>
+    <div class="field"><label>Bio line</label><textarea data-i="${i}" data-f="bio" class="ar-f"></textarea></div>
+    <div class="row2"><div class="field"><label>Instagram link</label><input type="text" data-i="${i}" data-f="instagram" class="ar-f"></div><div class="field"><label>Listen link</label><input type="text" data-i="${i}" data-f="listen" class="ar-f"></div></div>
+    </div>`).join('') + `<button class="btn add-btn" id="addArtist">+ Add artist</button>`;
+  el.querySelectorAll('.ar-f').forEach(inp => { inp.value = state.artists[inp.dataset.i][inp.dataset.f]; inp.addEventListener('input', () => { state.artists[inp.dataset.i][inp.dataset.f] = inp.value; refresh(); }); });
+  el.querySelectorAll('[data-action=removeArtist]').forEach(b => b.addEventListener('click', () => { state.artists.splice(b.dataset.i,1); renderArtistsPanel(); refresh(); }));
+  el.querySelectorAll('[data-artist-photo]').forEach(drop => {
+    drop.addEventListener('click', () => {
+      const i = drop.dataset.artistPhoto;
+      const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*';
+      input.onchange = () => { const file = input.files[0]; if (!file) return; const reader = new FileReader();
+        reader.onload = () => { state.artists[i].photo = reader.result; renderArtistsPanel(); refresh(); }; reader.readAsDataURL(file); };
+      input.click();
+    });
+  });
+  document.getElementById('addArtist').addEventListener('click', () => { state.artists.push({ name:"New Artist", genre:"Genre / City", bio:"One line on their sound.", instagram:"#", listen:"#", photo:"" }); renderArtistsPanel(); refresh(); });
+}
+function renderGearPanel(){
+  const el = document.getElementById('gearPanel');
+  el.innerHTML = `<div style="display:flex;flex-direction:column;gap:10px;margin-top:14px;">` + state.gear.map((g,i) => `<div class="item-card"><button class="remove" data-i="${i}" data-action="removeGear">×</button>
+    <div class="field"><label>Name</label><input type="text" data-i="${i}" data-f="name" class="gear-f"></div>
+    <div class="field"><label>Category</label><input type="text" data-i="${i}" data-f="category" class="gear-f" placeholder="Hardware or Software"></div>
+    </div>`).join('') + `<button class="btn add-btn" id="addGear">+ Add item</button></div>`;
+  el.querySelectorAll('.gear-f').forEach(inp => { inp.value = state.gear[inp.dataset.i][inp.dataset.f]; inp.addEventListener('input', () => { state.gear[inp.dataset.i][inp.dataset.f] = inp.value; refresh(); }); });
+  el.querySelectorAll('[data-action=removeGear]').forEach(b => b.addEventListener('click', () => { state.gear.splice(b.dataset.i,1); renderGearPanel(); refresh(); }));
+  document.getElementById('addGear').addEventListener('click', () => { state.gear.push({ name:"New Item", category:"Hardware" }); renderGearPanel(); refresh(); });
+}
+
+function renderSocialsPanel(){
+  const el = document.getElementById('socialsPanel');
+  el.innerHTML = state.socials.map((soc,i) => `<div class="item-card"><button class="remove" data-i="${i}" data-action="removeSocial">×</button>
+    <div class="field"><label>Platform</label>
+      <select data-i="${i}" class="soc-platform" style="background:var(--a-panel-2);border:1px solid var(--a-line);color:var(--a-text);padding:9px 10px;border-radius:3px;font-size:13.5px;">
+        ${SOCIAL_PLATFORMS.map(p => `<option value="${p}" ${soc.platform===p?'selected':''}>${p.charAt(0).toUpperCase()+p.slice(1)}</option>`).join('')}
+      </select>
+    </div>
+    <div class="field"><label>Link URL</label><input type="text" data-i="${i}" class="soc-url" placeholder="https://..."></div>
+    </div>`).join('') + `<button class="btn add-btn" id="addSocial">+ Add social link</button>`;
+  el.querySelectorAll('.soc-platform').forEach(sel => { sel.addEventListener('change', () => { state.socials[sel.dataset.i].platform = sel.value; refresh(); }); });
+  el.querySelectorAll('.soc-url').forEach(inp => { inp.value = state.socials[inp.dataset.i].url; inp.addEventListener('input', () => { state.socials[inp.dataset.i].url = inp.value; refresh(); }); });
+  el.querySelectorAll('[data-action=removeSocial]').forEach(b => b.addEventListener('click', () => { state.socials.splice(b.dataset.i,1); renderSocialsPanel(); refresh(); }));
+  document.getElementById('addSocial').addEventListener('click', () => { state.socials.push({ platform:"website", url:"" }); renderSocialsPanel(); refresh(); });
+}
+
+function bindImageDrop(selector, statePath, thumbId){
+  document.querySelector(selector).addEventListener('click', () => {
+    const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*';
+    input.onchange = () => { const file = input.files[0]; if (!file) return; const reader = new FileReader();
+      reader.onload = () => { state.theme[statePath] = reader.result; const thumb = document.getElementById(thumbId); thumb.src = reader.result; thumb.style.display = 'block'; refresh(); };
+      reader.readAsDataURL(file); };
+    input.click();
+  });
+}
+function bindFeatures(id, path){
+  const el = document.getElementById(id);
+  const get = () => path.split('.').reduce((o,k)=>o[k], state);
+  el.value = get().join('\n');
+  el.addEventListener('input', () => { const parts = path.split('.'); let o = state; for(let i=0;i<parts.length-1;i++) o = o[parts[i]]; o[parts[parts.length-1]] = el.value.split('\n').map(l=>l.trim()).filter(Boolean); refresh(); });
+}
+
+function initSidebar(){
+  bindSimple('c_bg','theme.bg'); bindSimple('c_bgPanel','theme.bgPanel'); bindSimple('c_gold','theme.gold');
+  bindSimple('c_goldBright','theme.goldBright'); bindSimple('c_bronze','theme.bronze'); bindSimple('c_cream','theme.cream');
+  bindSimple('f_display','theme.displayFont'); bindSimple('f_body','theme.bodyFont'); bindSimple('f_mono','theme.monoFont');
+  bindSimple('h_eyebrow','hero.eyebrow'); bindSimple('h_headline','hero.headline'); bindSimple('h_em','hero.em');
+  bindSimple('h_sub','hero.sub'); bindSimple('h_cta1','hero.cta1'); bindSimple('h_cta2','hero.cta2');
+  bindSimple('a_eyebrow','about.eyebrow'); bindSimple('a_heading','about.heading'); bindSimple('a_body','about.body');
+  bindSimple('g_eyebrow','gearSection.eyebrow'); bindSimple('g_heading','gearSection.heading'); bindSimple('g_body','gearSection.body');
+  bindSimple('p1_price','pricing.perSong.price'); bindSimple('p1_sub','pricing.perSong.sub'); bindSimple('p1_btn','pricing.perSong.btn');
+  bindSimple('p2_price','pricing.membership.price'); bindSimple('p2_sub','pricing.membership.sub'); bindSimple('p2_btn','pricing.membership.btn');
+  bindFeatures('p1_features','pricing.perSong.features'); bindFeatures('p2_features','pricing.membership.features');
+  bindSimple('ct_email','contact.email'); bindSimple('ct_instagram','contact.instagram'); bindSimple('ct_location','contact.location');
+  bindSimple('ft_text','footer.text');
+  if (state.theme.logoImage) { const t = document.getElementById('logoThumb'); t.src = state.theme.logoImage; t.style.display='block'; }
+  if (state.theme.heroBgImage) { const t = document.getElementById('heroThumb'); t.src = state.theme.heroBgImage; t.style.display='block'; }
+  bindImageDrop('[data-target="logoImage"]', 'logoImage', 'logoThumb');
+  bindImageDrop('[data-target="heroBgImage"]', 'heroBgImage', 'heroThumb');
+  renderProcessPanel(); renderTracksPanel(); renderArtistsPanel(); renderSocialsPanel(); renderGearPanel();
+}
+
+document.getElementById('exportBtn').addEventListener('click', () => {
+  const html = renderSite(state);
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'goldbear-productions-backup.html'; a.click();
+  URL.revokeObjectURL(url);
+});
+document.getElementById('resetBtn').addEventListener('click', () => {
+  if (!confirm('Reset the LIVE site back to the original default content? This affects what visitors see immediately.')) return;
+  state = JSON.parse(JSON.stringify(defaultState));
+  initSidebar(); refresh();
+});
+document.querySelectorAll('.viewport-toggle button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.viewport-toggle button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('preview').className = btn.dataset.vp;
+  });
+});
+
+/* ============================================================
+   AUTH GATE
+   ============================================================ */
+document.getElementById('login-btn').addEventListener('click', () => {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-password').value;
+  document.getElementById('login-error').textContent = '';
+  auth.signInWithEmailAndPassword(email, pass).catch(err => {
+    document.getElementById('login-error').textContent = err.message;
+  });
+});
+document.getElementById('signout-btn').addEventListener('click', () => auth.signOut());
+
+auth.onAuthStateChanged(user => {
+  if (user) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').classList.add('visible');
+    // Load current live state once, then keep listening for changes made
+    // from another tab/device so this editor always reflects what's live.
+    function normalize(s){
+      if (!s.socials) s.socials = JSON.parse(JSON.stringify(defaultState.socials));
+      if (!s.gear) s.gear = JSON.parse(JSON.stringify(defaultState.gear));
+      if (!s.gearSection) s.gearSection = JSON.parse(JSON.stringify(defaultState.gearSection));
+      return s;
+    }
+    siteRef.once('value').then(snap => {
+      const remote = snap.val();
+      if (remote) state = normalize(remote);
+      initSidebar();
+      document.getElementById('preview').srcdoc = renderSite(state);
+    });
+    siteRef.on('value', snap => {
+      if (suppressRemoteEcho) { suppressRemoteEcho = false; return; }
+      const remote = snap.val();
+      if (remote) { state = normalize(remote); initSidebar(); document.getElementById('preview').srcdoc = renderSite(state); }
+    });
+  } else {
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('app').classList.remove('visible');
+  }
+});
+</script>
+</body>
+</html>
