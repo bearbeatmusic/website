@@ -92,12 +92,12 @@
 <div id="login-screen">
   <div class="login-card">
     <h1>Goldbear Site Editor</h1>
-    <p>Sign in with your Firebase admin account to edit the live site.</p>
-    <input type="email" id="login-email" placeholder="Email">
+    <p>Sign in to edit the live site.</p>
+    <input type="text" id="login-email" placeholder="Username">
     <input type="password" id="login-password" placeholder="Password">
     <button id="login-btn">Sign in</button>
     <div class="login-error" id="login-error"></div>
-    <div class="login-note">This account is created once in your Firebase console under Authentication → Email/Password. See the setup notes for details.</div>
+    <div class="login-note">The username and password are stored in your Firebase Realtime Database under goldbear/admin. Note: this is a simple lock, not strong security — anyone who inspects the database directly can read these credentials.</div>
   </div>
 </div>
 
@@ -223,7 +223,6 @@
      FIREBASE — paste the SAME config here and in goldbear-productions.html
      ============================================================ -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script>
 const firebaseConfig = {
@@ -236,9 +235,9 @@ const firebaseConfig = {
   appId: "PASTE_APP_ID"
 };
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
 const db = firebase.database();
 const siteRef = db.ref('goldbear/site');
+const adminRef = db.ref('goldbear/admin');
 
 /* ============================================================
    STATE
@@ -641,46 +640,55 @@ document.querySelectorAll('.viewport-toggle button').forEach(btn => {
 });
 
 /* ============================================================
-   AUTH GATE
+   SIMPLE LOGIN (username/password stored in the database)
    ============================================================ */
-document.getElementById('login-btn').addEventListener('click', () => {
-  const email = document.getElementById('login-email').value.trim();
-  const pass = document.getElementById('login-password').value;
-  document.getElementById('login-error').textContent = '';
-  auth.signInWithEmailAndPassword(email, pass).catch(err => {
-    document.getElementById('login-error').textContent = err.message;
-  });
-});
-document.getElementById('signout-btn').addEventListener('click', () => auth.signOut());
-
-auth.onAuthStateChanged(user => {
-  if (user) {
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('app').classList.add('visible');
-    // Load current live state once, then keep listening for changes made
-    // from another tab/device so this editor always reflects what's live.
-    function normalize(s){
-      if (!s.socials) s.socials = JSON.parse(JSON.stringify(defaultState.socials));
-      if (!s.gear) s.gear = JSON.parse(JSON.stringify(defaultState.gear));
-      if (!s.gearSection) s.gearSection = JSON.parse(JSON.stringify(defaultState.gearSection));
-      return s;
-    }
-    siteRef.once('value').then(snap => {
-      const remote = snap.val();
-      if (remote) state = normalize(remote);
-      initSidebar();
-      document.getElementById('preview').srcdoc = renderSite(state);
-    });
-    siteRef.on('value', snap => {
-      if (suppressRemoteEcho) { suppressRemoteEcho = false; return; }
-      const remote = snap.val();
-      if (remote) { state = normalize(remote); initSidebar(); document.getElementById('preview').srcdoc = renderSite(state); }
-    });
-  } else {
-    document.getElementById('login-screen').style.display = 'flex';
-    document.getElementById('app').classList.remove('visible');
+function showApp(){
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').classList.add('visible');
+  function normalize(s){
+    if (!s.socials) s.socials = JSON.parse(JSON.stringify(defaultState.socials));
+    if (!s.gear) s.gear = JSON.parse(JSON.stringify(defaultState.gear));
+    if (!s.gearSection) s.gearSection = JSON.parse(JSON.stringify(defaultState.gearSection));
+    return s;
   }
+  siteRef.once('value').then(snap => {
+    const remote = snap.val();
+    if (remote) state = normalize(remote);
+    initSidebar();
+    document.getElementById('preview').srcdoc = renderSite(state);
+  });
+  siteRef.on('value', snap => {
+    if (suppressRemoteEcho) { suppressRemoteEcho = false; return; }
+    const remote = snap.val();
+    if (remote) { state = normalize(remote); initSidebar(); document.getElementById('preview').srcdoc = renderSite(state); }
+  });
+}
+function showLogin(){
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('app').classList.remove('visible');
+}
+
+document.getElementById('login-btn').addEventListener('click', () => {
+  const user = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-password').value;
+  const errEl = document.getElementById('login-error');
+  errEl.textContent = '';
+  adminRef.once('value').then(snap => {
+    const creds = snap.val();
+    if (creds && user === creds.username && pass === creds.password) {
+      localStorage.setItem('goldbear_admin_session', 'true');
+      showApp();
+    } else {
+      errEl.textContent = 'Incorrect username or password.';
+    }
+  }).catch(() => { errEl.textContent = 'Could not reach the database. Check your Firebase config.'; });
 });
+document.getElementById('signout-btn').addEventListener('click', () => {
+  localStorage.removeItem('goldbear_admin_session');
+  showLogin();
+});
+
+if (localStorage.getItem('goldbear_admin_session') === 'true') { showApp(); } else { showLogin(); }
 </script>
 </body>
 </html>
