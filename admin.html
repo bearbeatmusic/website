@@ -199,6 +199,19 @@
       </div>
     </details>
 
+    <details>
+      <summary>Roster process page</summary>
+      <div class="panel">
+        <div class="field"><label>Eyebrow</label><input type="text" id="rp_eyebrow"></div>
+        <div class="field"><label>Heading</label><input type="text" id="rp_heading"></div>
+        <div class="field"><label>Intro</label><textarea id="rp_intro"></textarea></div>
+        <div id="rosterStepsPanel"></div>
+        <div class="field"><label>Note (e.g. on-site / video call)</label><textarea id="rp_note"></textarea></div>
+        <div class="field"><label>Bottom CTA button</label><input type="text" id="rp_ctaBtn"></div>
+        <div class="hint">This now opens as a popup window when someone clicks "Join the roster" or the Process nav link.</div>
+      </div>
+    </details>
+
     <details><summary>Catalog tracks</summary><div class="panel" id="tracksPanel"></div></details>
     <details><summary>Current artists</summary><div class="panel" id="artistsPanel"></div></details>
     <details><summary>Social media</summary><div class="panel" id="socialsPanel"></div></details>
@@ -265,13 +278,31 @@ const defaultState = {
     { title:"Release", body:"Every song leaves the building fully mixed and mastered — ready to put your name on and put out into the world." }
   ],
   gearSection: { eyebrow:"The studio", heading:"What we record and mix with.", body:"The same hardware and software behind every session, so what you hear in the room is what you hear on the release." },
+  rosterProcess: {
+    eyebrow: "How it works",
+    heading: "From vision to release.",
+    intro: "Here's exactly what happens once you join the roster — start to finish.",
+    note: "Everything through Sound Design can happen on-site or over a video call — whatever works best for you.",
+    ctaBtn: "Join the roster",
+    steps: [
+      { title:"Vision & Direction", body:"We analyze your project and set a vision, understanding where it's going before anything gets recorded." },
+      { title:"Sound Reference", body:"We figure out what kind of songs fit your project and where it should sit sonically." },
+      { title:"Songwriting Sessions", body:"We write the song together and put together drafts, shaping it into something worth recording." },
+      { title:"Sound Design", body:"We explore and settle on the best sounds and textures for the track." },
+      { title:"Vocal Recording", body:"Vocals are recorded professionally in the studio, with a certified vocal coach in the room." },
+      { title:"Review", body:"We revise the song for any mistakes and schedule a re-recording session if anything needs another pass." },
+      { title:"Mix & Master", body:"The song goes to our mix and master engineer, with unlimited revisions until it's ready for platforms." },
+      { title:"Social Setup", body:"We link every social media account to your artist profile so everything points back to you." },
+      { title:"Distribution", body:"We distribute your song to every platform, 20 days ahead of release — enough time to run a real promotion campaign." }
+    ]
+  },
   gear: [
-    { name:"Pro Tools", category:"Software", image:"" },
-    { name:"AKG C314", category:"Hardware", image:"" },
-    { name:"Waves Plugins", category:"Software", image:"" },
-    { name:"Auto-Tune", category:"Software", image:"" },
-    { name:"Audient iD24", category:"Hardware", image:"" },
-    { name:"Shure SM7B", category:"Hardware", image:"" }
+    { name:"Pro Tools", category:"Software", image:"", link:"" },
+    { name:"AKG C314", category:"Hardware", image:"", link:"" },
+    { name:"Waves Plugins", category:"Software", image:"", link:"" },
+    { name:"Auto-Tune", category:"Software", image:"", link:"" },
+    { name:"Audient iD24", category:"Hardware", image:"", link:"" },
+    { name:"Shure SM7B", category:"Hardware", image:"", link:"" }
   ],
   pricing: {
     perSong: { price:"$599", sub:"One-time · pay per track", btn:"Book a song",
@@ -351,13 +382,14 @@ function renderSite(s){
     : `background: radial-gradient(ellipse 60% 50% at 85% 15%, rgba(200,155,60,0.12), transparent 60%), var(--bg);`;
   const logoMark = t.logoImage ? `<img src="${t.logoImage}" alt="${esc(s.companyName)}" style="height:26px;width:auto;">` : `<span class="mark"></span>`;
   const processHtml = s.process.map((p,i)=>`<div class="process-step"><div class="num">0${i+1} / ${esc(p.title).toUpperCase()}</div><h3>${esc(p.title)}</h3><p>${esc(p.body)}</p></div>`).join('');
-  const gearCard = (g) => {
+  const rosterStepsHtml = (s.rosterProcess.steps||[]).map((st,i)=>`<div class="roster-step"><div class="num">0${i+1}</div><div><h3>${esc(st.title)}</h3><p>${esc(st.body)}</p></div></div>`).join('');
+  const gearCardImg = (g) => {
     const gi = initials(g.name);
     const img = g.image ? `<img src="${g.image}" alt="${esc(g.name)}">` : `<span class="gear-placeholder">${esc(gi)}</span>`;
     return `<div class="gear-card"><div class="gear-card-img">${img}</div><div class="gear-card-name">${esc(g.name)}</div></div>`;
   };
-  const gearHW = (s.gear||[]).filter(g => (g.category||'').trim().toLowerCase() === 'hardware').map(gearCard).join('');
-  const gearSW = (s.gear||[]).filter(g => (g.category||'').trim().toLowerCase() !== 'hardware').map(gearCard).join('');
+  const gearHW = (s.gear||[]).filter(g => (g.category||'').trim().toLowerCase() === 'hardware').map(gearCardImg).join('');
+  const gearSW = (s.gear||[]).filter(g => (g.category||'').trim().toLowerCase() !== 'hardware').map(gearCardImg).join('');
   const featList = arr => arr.map(f=>`<li>${esc(f)}</li>`).join('');
   const tracksHtml = s.tracks.map((tr,i)=> {
     if (tr.soundcloudUrl) {
@@ -452,6 +484,21 @@ function renderSite(s){
   .process-step{ background:var(--bg); padding:40px 34px; } .process-step .num{ font-family:${fam(t.monoFont,'monospace')}; font-size:13px; color:var(--bronze); letter-spacing:.08em; }
   .process-step h3{ font-size:24px; margin:18px 0 12px; color:var(--gold-bright); } .process-step p{ color:var(--cream-dim); font-size:15px; }
   .services{ background:var(--bg-panel); } .pricing-grid{ margin-top:60px; display:grid; grid-template-columns:1fr 1fr; gap:28px; }
+  .roster-timeline{ margin-top:54px; display:flex; flex-direction:column; }
+  .roster-step{ display:grid; grid-template-columns:56px 1fr; gap:24px; padding:26px 0; border-top:1px solid var(--line); }
+  .roster-step:last-child{ border-bottom:1px solid var(--line); }
+  .roster-step .num{ font-family:${fam(t.monoFont,'monospace')}; font-size:20px; color:var(--gold); }
+  .roster-step h3{ font-size:19px; color:var(--cream); margin-bottom:8px; }
+  .roster-step p{ color:var(--cream-dim); font-size:15px; max-width:560px; }
+  .roster-note{ margin-top:32px; padding:20px 24px; border:1px solid var(--gold); border-radius:4px; background:rgba(200,155,60,0.06); font-size:14px; color:var(--cream-dim); }
+  .roster-cta{ margin-top:54px; text-align:center; }
+  .roster-cta p{ font-family:${fam(t.monoFont,'monospace')}; font-size:13px; letter-spacing:.06em; text-transform:uppercase; color:var(--cream-dim); margin-bottom:18px; }
+  .modal-overlay{ display:none; position:fixed; inset:0; background:rgba(10,9,8,0.78); z-index:1000; align-items:center; justify-content:center; padding:24px; }
+  .modal-overlay.open{ display:flex; }
+  .modal-box{ position:relative; background:var(--bg); border:1px solid var(--line); border-radius:8px; max-width:760px; width:100%; max-height:88vh; overflow-y:auto; padding:48px 44px; }
+  .modal-close{ position:absolute; top:18px; right:18px; width:36px; height:36px; border-radius:50%; border:1px solid var(--line); background:transparent; color:var(--cream-dim); font-size:22px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+  .modal-close:hover{ border-color:var(--gold); color:var(--gold-bright); }
+  @media (max-width:600px){ .modal-box{ padding:36px 24px; } }
   .price-card{ border:1px solid var(--line); padding:44px 40px; background:var(--bg); position:relative; }
   .price-card.featured{ border-color:var(--gold); background:linear-gradient(165deg,rgba(200,155,60,0.08),var(--bg) 60%); }
   .price-card.featured::before{ content:'RECOMMENDED'; position:absolute; top:-1px; right:-1px; background:var(--gold); color:var(--bg); font-family:${fam(t.monoFont,'monospace')}; font-size:10.5px; letter-spacing:.1em; padding:7px 14px; }
@@ -506,7 +553,7 @@ function renderSite(s){
   @media (max-width:560px){ .artist-grid{ grid-template-columns:1fr; } .wrap{ padding:0 20px; } .contact-methods{ flex-direction:column; align-items:center; } }
 </style></head><body>
 <header id="site-header"><nav class="wrap"><div class="logo">${logoMark} ${esc(s.companyName)}</div>
-<div class="navlinks"><a href="#about">About</a><a href="#services">Services</a><a href="#catalog">Catalog</a><a href="#artists">Artists</a><a href="#contact">Contact</a></div>
+<div class="navlinks"><a href="#about">About</a><a href="#services">Services</a><a href="#" class="roster-trigger">Process</a><a href="#catalog">Catalog</a><a href="#artists">Artists</a><a href="#contact">Contact</a></div>
 <a href="#contact" class="nav-cta">Book a session</a></nav></header>
 <section class="hero"><div class="wrap hero-inner"><div>
 <div class="eyebrow">${esc(s.hero.eyebrow)}</div>
@@ -528,8 +575,16 @@ function renderSite(s){
 <div class="price-card"><div class="tier">Per Song</div><div class="amount">${esc(s.pricing.perSong.price)}</div><div class="sub">${esc(s.pricing.perSong.sub)}</div>
 <ul>${featList(s.pricing.perSong.features)}</ul><a href="#contact" class="btn btn-outline">${esc(s.pricing.perSong.btn)}</a></div>
 <div class="price-card featured"><div class="tier">Monthly Membership</div><div class="amount">${esc(s.pricing.membership.price)}</div><div class="sub">${esc(s.pricing.membership.sub)}</div>
-<ul>${featList(s.pricing.membership.features)}</ul><a href="#contact" class="btn btn-primary">${esc(s.pricing.membership.btn)}</a></div>
+<ul>${featList(s.pricing.membership.features)}</ul><a href="#" class="btn btn-primary roster-trigger">${esc(s.pricing.membership.btn)}</a></div>
 </div></div></section>
+<div class="modal-overlay" id="roster-modal-overlay">
+<div class="modal-box" role="dialog" aria-modal="true">
+<button class="modal-close" id="roster-modal-close" aria-label="Close">&times;</button>
+<div class="about-head"><div class="eyebrow">${esc(s.rosterProcess.eyebrow)}</div><h2>${esc(s.rosterProcess.heading)}</h2><p>${esc(s.rosterProcess.intro)}</p></div>
+<div class="roster-timeline">${rosterStepsHtml}</div>
+<div class="roster-note">${esc(s.rosterProcess.note)}</div>
+<div class="roster-cta"><a href="#contact" class="btn btn-primary" id="rp-cta-btn">${esc(s.rosterProcess.ctaBtn)}</a></div>
+</div></div>
 <section id="catalog"><div class="wrap"><div class="catalog-head"><div><div class="eyebrow">Produced by us</div><h2>From the studio floor.</h2></div></div>
 <div class="track-list">${tracksHtml}</div><p class="catalog-note">Add audio file URLs in the editor to make playback work.</p></div></section>
 <div class="scratch-divider" aria-hidden="true"><span></span><span></span><span></span></div>
@@ -543,11 +598,19 @@ function renderSite(s){
 <div class="contact-method"><div class="k">Based in</div><div class="v">${esc(s.contact.location)}</div></div></div>
 <div class="social-row">${socialsHtml}</div></div></section>
 <footer><div class="wrap"><div class="logo">${logoMark} ${esc(s.companyName)}</div>
-<div class="foot-links"><a href="#about">About</a><a href="#services">Services</a><a href="#catalog">Catalog</a><a href="#artists">Artists</a></div>
+<div class="foot-links"><a href="#about">About</a><a href="#services">Services</a><a href="#" class="roster-trigger">Process</a><a href="#catalog">Catalog</a><a href="#artists">Artists</a></div>
 <div class="copyright">${esc(s.footer.text)}</div></div></footer>
 <script>
   const header = document.getElementById('site-header');
   window.addEventListener('scroll', () => { header.classList.toggle('scrolled', window.scrollY > 40); });
+  const rosterOverlay = document.getElementById('roster-modal-overlay');
+  function openRosterModal(){ rosterOverlay.classList.add('open'); document.body.style.overflow = 'hidden'; }
+  function closeRosterModal(){ rosterOverlay.classList.remove('open'); document.body.style.overflow = ''; }
+  document.querySelectorAll('.roster-trigger').forEach(el => { el.addEventListener('click', (e) => { e.preventDefault(); openRosterModal(); }); });
+  document.getElementById('roster-modal-close').addEventListener('click', closeRosterModal);
+  rosterOverlay.addEventListener('click', (e) => { if (e.target === rosterOverlay) closeRosterModal(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeRosterModal(); });
+  document.getElementById('rp-cta-btn').addEventListener('click', closeRosterModal);
   document.querySelectorAll('.track').forEach(track => {
     const btn = track.querySelector('.play-btn');
     const audio = track.querySelector('audio');
@@ -628,6 +691,17 @@ function renderProcessPanel(){
   el.querySelectorAll('.proc-title').forEach(inp => { inp.value = state.process[inp.dataset.i].title; inp.addEventListener('input', () => { state.process[inp.dataset.i].title = inp.value; refresh(); }); });
   el.querySelectorAll('.proc-body').forEach(inp => { inp.value = state.process[inp.dataset.i].body; inp.addEventListener('input', () => { state.process[inp.dataset.i].body = inp.value; refresh(); }); });
 }
+function renderRosterStepsPanel(){
+  const el = document.getElementById('rosterStepsPanel');
+  const steps = state.rosterProcess.steps;
+  el.innerHTML = `<div style="display:flex;flex-direction:column;gap:10px;margin:14px 0;">` + steps.map((st,i) => `<div class="item-card"><button class="remove" data-i="${i}" data-action="removeRosterStep">×</button>
+    <div class="field"><label>Step ${i+1} title</label><input type="text" data-i="${i}" data-f="title" class="rp-step-f"></div>
+    <div class="field"><label>Step ${i+1} body</label><textarea data-i="${i}" data-f="body" class="rp-step-f"></textarea></div>
+    </div>`).join('') + `<button class="btn add-btn" id="addRosterStep">+ Add step</button></div>`;
+  el.querySelectorAll('.rp-step-f').forEach(inp => { inp.value = steps[inp.dataset.i][inp.dataset.f]; inp.addEventListener('input', () => { steps[inp.dataset.i][inp.dataset.f] = inp.value; refresh(); }); });
+  el.querySelectorAll('[data-action=removeRosterStep]').forEach(b => b.addEventListener('click', () => { steps.splice(b.dataset.i,1); renderRosterStepsPanel(); refresh(); }));
+  document.getElementById('addRosterStep').addEventListener('click', () => { steps.push({ title:"New Step", body:"Describe what happens here." }); renderRosterStepsPanel(); refresh(); });
+}
 function renderTracksPanel(){
   const el = document.getElementById('tracksPanel');
   el.innerHTML = state.tracks.map((tr,i) => `<div class="item-card"><button class="remove" data-i="${i}" data-action="removeTrack">×</button>
@@ -673,8 +747,9 @@ function renderGearPanel(){
     <div class="file-drop" data-gear-photo="${i}">Click to upload logo/photo</div>
     <div class="field"><label>Name</label><input type="text" data-i="${i}" data-f="name" class="gear-f"></div>
     <div class="field"><label>Category</label><input type="text" data-i="${i}" data-f="category" class="gear-f" placeholder="Hardware or Software"></div>
+    <div class="hint">On Hardware items, this adds an info button linking to the product page.</div>
     </div>`).join('') + `<button class="btn add-btn" id="addGear">+ Add item</button></div>`;
-  el.querySelectorAll('.gear-f').forEach(inp => { inp.value = state.gear[inp.dataset.i][inp.dataset.f]; inp.addEventListener('input', () => { state.gear[inp.dataset.i][inp.dataset.f] = inp.value; refresh(); }); });
+  el.querySelectorAll('.gear-f').forEach(inp => { inp.value = state.gear[inp.dataset.i][inp.dataset.f] || ''; inp.addEventListener('input', () => { state.gear[inp.dataset.i][inp.dataset.f] = inp.value; refresh(); }); });
   el.querySelectorAll('[data-action=removeGear]').forEach(b => b.addEventListener('click', () => { state.gear.splice(b.dataset.i,1); renderGearPanel(); refresh(); }));
   el.querySelectorAll('[data-gear-photo]').forEach(drop => {
     drop.addEventListener('click', () => {
@@ -733,6 +808,8 @@ function initSidebar(){
   bindSimple('h_sub','hero.sub'); bindSimple('h_cta1','hero.cta1'); bindSimple('h_cta2','hero.cta2');
   bindSimple('a_eyebrow','about.eyebrow'); bindSimple('a_heading','about.heading'); bindSimple('a_body','about.body');
   bindSimple('g_eyebrow','gearSection.eyebrow'); bindSimple('g_heading','gearSection.heading'); bindSimple('g_body','gearSection.body');
+  bindSimple('rp_eyebrow','rosterProcess.eyebrow'); bindSimple('rp_heading','rosterProcess.heading'); bindSimple('rp_intro','rosterProcess.intro');
+  bindSimple('rp_note','rosterProcess.note'); bindSimple('rp_ctaBtn','rosterProcess.ctaBtn');
   bindSimple('p1_price','pricing.perSong.price'); bindSimple('p1_sub','pricing.perSong.sub'); bindSimple('p1_btn','pricing.perSong.btn');
   bindSimple('p2_price','pricing.membership.price'); bindSimple('p2_sub','pricing.membership.sub'); bindSimple('p2_btn','pricing.membership.btn');
   bindFeatures('p1_features','pricing.perSong.features'); bindFeatures('p2_features','pricing.membership.features');
@@ -742,7 +819,7 @@ function initSidebar(){
   if (state.theme.heroBgImage) { const t = document.getElementById('heroThumb'); t.src = state.theme.heroBgImage; t.style.display='block'; }
   bindImageDrop('[data-target="logoImage"]', 'logoImage', 'logoThumb');
   bindImageDrop('[data-target="heroBgImage"]', 'heroBgImage', 'heroThumb');
-  renderProcessPanel(); renderTracksPanel(); renderArtistsPanel(); renderSocialsPanel(); renderGearPanel();
+  renderProcessPanel(); renderTracksPanel(); renderArtistsPanel(); renderSocialsPanel(); renderGearPanel(); renderRosterStepsPanel();
 }
 
 document.getElementById('exportBtn').addEventListener('click', () => {
@@ -776,6 +853,7 @@ function showApp(){
     if (!s.gear) s.gear = JSON.parse(JSON.stringify(defaultState.gear));
     if (!s.gearSection) s.gearSection = JSON.parse(JSON.stringify(defaultState.gearSection));
     if (!s.companyName) s.companyName = defaultState.companyName;
+    if (!s.rosterProcess) s.rosterProcess = JSON.parse(JSON.stringify(defaultState.rosterProcess));
     return s;
   }
   siteRef.once('value').then(snap => {
