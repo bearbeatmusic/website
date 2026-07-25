@@ -266,12 +266,12 @@ const defaultState = {
   ],
   gearSection: { eyebrow:"The studio", heading:"What we record and mix with.", body:"The same hardware and software behind every session, so what you hear in the room is what you hear on the release." },
   gear: [
-    { name:"Pro Tools", category:"Software" },
-    { name:"AKG C314", category:"Hardware" },
-    { name:"Waves Plugins", category:"Software" },
-    { name:"Auto-Tune", category:"Software" },
-    { name:"Audient iD24", category:"Hardware" },
-    { name:"Shure SM7B", category:"Hardware" }
+    { name:"Pro Tools", category:"Software", image:"" },
+    { name:"AKG C314", category:"Hardware", image:"" },
+    { name:"Waves Plugins", category:"Software", image:"" },
+    { name:"Auto-Tune", category:"Software", image:"" },
+    { name:"Audient iD24", category:"Hardware", image:"" },
+    { name:"Shure SM7B", category:"Hardware", image:"" }
   ],
   pricing: {
     perSong: { price:"$599", sub:"One-time · pay per track", btn:"Book a song",
@@ -351,7 +351,13 @@ function renderSite(s){
     : `background: radial-gradient(ellipse 60% 50% at 85% 15%, rgba(200,155,60,0.12), transparent 60%), var(--bg);`;
   const logoMark = t.logoImage ? `<img src="${t.logoImage}" alt="${esc(s.companyName)}" style="height:26px;width:auto;">` : `<span class="mark"></span>`;
   const processHtml = s.process.map((p,i)=>`<div class="process-step"><div class="num">0${i+1} / ${esc(p.title).toUpperCase()}</div><h3>${esc(p.title)}</h3><p>${esc(p.body)}</p></div>`).join('');
-  const gearHtml = (s.gear||[]).map((g,i)=>`<div class="gear-row"><div class="gear-index">0${i+1}</div><div class="gear-name">${esc(g.name)}</div><div class="track-tag">${esc(g.category)}</div></div>`).join('');
+  const gearCard = (g) => {
+    const gi = initials(g.name);
+    const img = g.image ? `<img src="${g.image}" alt="${esc(g.name)}">` : `<span class="gear-placeholder">${esc(gi)}</span>`;
+    return `<div class="gear-card"><div class="gear-card-img">${img}</div><div class="gear-card-name">${esc(g.name)}</div></div>`;
+  };
+  const gearHW = (s.gear||[]).filter(g => (g.category||'').trim().toLowerCase() === 'hardware').map(gearCard).join('');
+  const gearSW = (s.gear||[]).filter(g => (g.category||'').trim().toLowerCase() !== 'hardware').map(gearCard).join('');
   const featList = arr => arr.map(f=>`<li>${esc(f)}</li>`).join('');
   const tracksHtml = s.tracks.map((tr,i)=> {
     if (tr.soundcloudUrl) {
@@ -468,10 +474,15 @@ function renderSite(s){
   .stream-track-head{ display:grid; grid-template-columns:36px 1fr auto; align-items:center; gap:16px; margin-bottom:12px; }
   .stream-embed{ border-radius:6px; overflow:hidden; border:1px solid var(--line); }
   .stream-embed iframe{ display:block; width:100%; border:none; }
-  .gear-list{ margin-top:54px; border-top:1px solid var(--line); }
-  .gear-row{ display:grid; grid-template-columns:44px 1fr auto; align-items:center; gap:20px; padding:20px 0; border-bottom:1px solid var(--line); }
-  .gear-index{ font-family:${fam(t.monoFont,'monospace')}; color:var(--cream-dim); font-size:13px; }
-  .gear-name{ font-weight:600; font-size:16px; color:var(--cream); }
+  .gear-group{ margin-top:54px; } .gear-group + .gear-group{ margin-top:36px; }
+  .gear-group-title{ font-family:${fam(t.monoFont,'monospace')}; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--bronze); margin-bottom:18px; }
+  .gear-scroll{ display:flex; gap:16px; overflow-x:auto; padding-bottom:16px; scroll-snap-type:x proximity; -webkit-overflow-scrolling:touch; }
+  .gear-scroll::-webkit-scrollbar{ height:6px; } .gear-scroll::-webkit-scrollbar-track{ background:var(--line); } .gear-scroll::-webkit-scrollbar-thumb{ background:var(--bronze); border-radius:3px; }
+  .gear-card{ flex:0 0 100px; scroll-snap-align:start; text-align:center; }
+  .gear-card-img{ width:68px; height:68px; border-radius:50%; overflow:hidden; margin:0 auto 10px; background:var(--bg-panel-2); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; }
+  .gear-card-img img{ width:100%; height:100%; object-fit:cover; }
+  .gear-card-img .gear-placeholder{ font-family:${fam(t.monoFont,'monospace')}; font-size:11px; color:var(--cream-dim); letter-spacing:.05em; }
+  .gear-card-name{ font-weight:600; font-size:12.5px; color:var(--cream); line-height:1.3; }
   .artists{ background:var(--bg-panel); } .artist-grid{ margin-top:60px; display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
   .artist-card{ border:1px solid var(--line); background:var(--bg); overflow:hidden; }
   .artist-photo{ height:220px; background:linear-gradient(150deg,var(--bg-panel-2),var(--bg)); display:flex; align-items:center; justify-content:center; border-bottom:1px solid var(--line); overflow:hidden; }
@@ -508,7 +519,8 @@ function renderSite(s){
 <div class="process">${processHtml}</div></div></section>
 <div class="scratch-divider" aria-hidden="true"><span></span><span></span><span></span></div>
 <section id="gear"><div class="wrap"><div class="about-head"><div class="eyebrow">${esc(s.gearSection.eyebrow)}</div><h2>${esc(s.gearSection.heading)}</h2><p>${esc(s.gearSection.body)}</p></div>
-<div class="gear-list">${gearHtml}</div></div></section>
+<div class="gear-group"><div class="gear-group-title">Hardware</div><div class="gear-scroll">${gearHW}</div></div>
+<div class="gear-group"><div class="gear-group-title">Software</div><div class="gear-scroll">${gearSW}</div></div></div></section>
 <div class="scratch-divider" aria-hidden="true"><span></span><span></span><span></span></div>
 <section id="services" class="services"><div class="wrap"><div class="about-head"><div class="eyebrow">What it costs</div><h2>Two ways to work with us.</h2>
 <p>One song at a time, or ongoing — either way, you get a real studio, a real vocal coach, and real development behind every release.</p></div>
@@ -657,12 +669,27 @@ function renderArtistsPanel(){
 function renderGearPanel(){
   const el = document.getElementById('gearPanel');
   el.innerHTML = `<div style="display:flex;flex-direction:column;gap:10px;margin-top:14px;">` + state.gear.map((g,i) => `<div class="item-card"><button class="remove" data-i="${i}" data-action="removeGear">×</button>
+    <img class="thumb" id="gearThumb${i}" style="${g.image ? 'display:block;' : ''}" src="${g.image||''}">
+    <div class="file-drop" data-gear-photo="${i}">Click to upload logo/photo</div>
     <div class="field"><label>Name</label><input type="text" data-i="${i}" data-f="name" class="gear-f"></div>
     <div class="field"><label>Category</label><input type="text" data-i="${i}" data-f="category" class="gear-f" placeholder="Hardware or Software"></div>
     </div>`).join('') + `<button class="btn add-btn" id="addGear">+ Add item</button></div>`;
   el.querySelectorAll('.gear-f').forEach(inp => { inp.value = state.gear[inp.dataset.i][inp.dataset.f]; inp.addEventListener('input', () => { state.gear[inp.dataset.i][inp.dataset.f] = inp.value; refresh(); }); });
   el.querySelectorAll('[data-action=removeGear]').forEach(b => b.addEventListener('click', () => { state.gear.splice(b.dataset.i,1); renderGearPanel(); refresh(); }));
-  document.getElementById('addGear').addEventListener('click', () => { state.gear.push({ name:"New Item", category:"Hardware" }); renderGearPanel(); refresh(); });
+  el.querySelectorAll('[data-gear-photo]').forEach(drop => {
+    drop.addEventListener('click', () => {
+      const i = drop.dataset.gearPhoto;
+      const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*';
+      input.onchange = () => {
+        const file = input.files[0]; if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => { state.gear[i].image = reader.result; renderGearPanel(); refresh(); };
+        reader.readAsDataURL(file);
+      };
+      input.click();
+    });
+  });
+  document.getElementById('addGear').addEventListener('click', () => { state.gear.push({ name:"New Item", category:"Hardware", image:"" }); renderGearPanel(); refresh(); });
 }
 
 function renderSocialsPanel(){
