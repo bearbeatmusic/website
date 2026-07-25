@@ -114,6 +114,14 @@
     </div>
 
     <details open>
+      <summary>Company name</summary>
+      <div class="panel">
+        <div class="field"><label>Company name</label><input type="text" id="company_name"></div>
+        <div class="hint">Used in the browser tab title and both logo areas (header and footer).</div>
+      </div>
+    </details>
+
+    <details open>
       <summary>Colors &amp; fonts</summary>
       <div class="panel">
         <div class="color-row">
@@ -243,6 +251,7 @@ const adminRef = db.ref('goldbear/admin');
    STATE
    ============================================================ */
 const defaultState = {
+  companyName: "BearBeat Music",
   theme: { bg:"#14110D", bgPanel:"#1C1712", bgPanel2:"#221B14", gold:"#C89B3C", goldBright:"#E8C468", bronze:"#8B5A2B",
     cream:"#F2EBDD", creamDim:"#B9AE9B", displayFont:"Fraunces", bodyFont:"Manrope", monoFont:"JetBrains Mono", logoImage:"", heroBgImage:"" },
   hero: { eyebrow:"Independent Artist Incubator — Mexico City", headline:"We produce the artist, not just the song.", em:"the artist",
@@ -287,7 +296,7 @@ const defaultState = {
     { platform:"tiktok", url:"https://tiktok.com/@goldbearproductions" },
     { platform:"spotify", url:"#" }
   ],
-  footer: { text:"© 2026 Goldbear Productions" }
+  footer: { text:"© 2026 BearBeat Music" }
 };
 
 let state = JSON.parse(JSON.stringify(defaultState));
@@ -340,7 +349,7 @@ function renderSite(s){
   const heroStyle = t.heroBgImage
     ? `background: linear-gradient(rgba(20,17,13,.82),rgba(20,17,13,.9)), url('${t.heroBgImage}') center/cover no-repeat;`
     : `background: radial-gradient(ellipse 60% 50% at 85% 15%, rgba(200,155,60,0.12), transparent 60%), var(--bg);`;
-  const logoMark = t.logoImage ? `<img src="${t.logoImage}" alt="Goldbear Productions" style="height:26px;width:auto;">` : `<span class="mark"></span>`;
+  const logoMark = t.logoImage ? `<img src="${t.logoImage}" alt="${esc(s.companyName)}" style="height:26px;width:auto;">` : `<span class="mark"></span>`;
   const processHtml = s.process.map((p,i)=>`<div class="process-step"><div class="num">0${i+1} / ${esc(p.title).toUpperCase()}</div><h3>${esc(p.title)}</h3><p>${esc(p.body)}</p></div>`).join('');
   const gearHtml = (s.gear||[]).map((g,i)=>`<div class="gear-row"><div class="gear-index">0${i+1}</div><div class="gear-name">${esc(g.name)}</div><div class="track-tag">${esc(g.category)}</div></div>`).join('');
   const featList = arr => arr.map(f=>`<li>${esc(f)}</li>`).join('');
@@ -389,7 +398,7 @@ function renderSite(s){
       </div>`).join('');
 
   return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Goldbear Productions — Independent Artist Incubator</title>
+<title>${esc(s.companyName)} — Independent Artist Incubator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="${fontsUrl(t.displayFont, t.bodyFont, t.monoFont)}" rel="stylesheet">
 <script src="https://w.soundcloud.com/player/api.js"><\/script>
@@ -485,7 +494,7 @@ function renderSite(s){
   @media (max-width:900px){ .hero-inner{ grid-template-columns:1fr; } .hero-visual{ height:200px; } .process{ grid-template-columns:1fr; } .pricing-grid{ grid-template-columns:1fr; } .artist-grid{ grid-template-columns:1fr 1fr; } .navlinks{ display:none; } }
   @media (max-width:560px){ .artist-grid{ grid-template-columns:1fr; } .wrap{ padding:0 20px; } .contact-methods{ flex-direction:column; align-items:center; } }
 </style></head><body>
-<header id="site-header"><nav class="wrap"><div class="logo">${logoMark} Goldbear Productions</div>
+<header id="site-header"><nav class="wrap"><div class="logo">${logoMark} ${esc(s.companyName)}</div>
 <div class="navlinks"><a href="#about">About</a><a href="#services">Services</a><a href="#catalog">Catalog</a><a href="#artists">Artists</a><a href="#contact">Contact</a></div>
 <a href="#contact" class="nav-cta">Book a session</a></nav></header>
 <section class="hero"><div class="wrap hero-inner"><div>
@@ -521,7 +530,7 @@ function renderSite(s){
 <div class="contact-method"><div class="k">Instagram</div><div class="v">${esc(s.contact.instagram)}</div></div>
 <div class="contact-method"><div class="k">Based in</div><div class="v">${esc(s.contact.location)}</div></div></div>
 <div class="social-row">${socialsHtml}</div></div></section>
-<footer><div class="wrap"><div class="logo">${logoMark} Goldbear Productions</div>
+<footer><div class="wrap"><div class="logo">${logoMark} ${esc(s.companyName)}</div>
 <div class="foot-links"><a href="#about">About</a><a href="#services">Services</a><a href="#catalog">Catalog</a><a href="#artists">Artists</a></div>
 <div class="copyright">${esc(s.footer.text)}</div></div></footer>
 <script>
@@ -689,6 +698,7 @@ function bindFeatures(id, path){
 }
 
 function initSidebar(){
+  bindSimple('company_name','companyName');
   bindSimple('c_bg','theme.bg'); bindSimple('c_bgPanel','theme.bgPanel'); bindSimple('c_gold','theme.gold');
   bindSimple('c_goldBright','theme.goldBright'); bindSimple('c_bronze','theme.bronze'); bindSimple('c_cream','theme.cream');
   bindSimple('f_display','theme.displayFont'); bindSimple('f_body','theme.bodyFont'); bindSimple('f_mono','theme.monoFont');
@@ -738,6 +748,7 @@ function showApp(){
     if (!s.socials) s.socials = JSON.parse(JSON.stringify(defaultState.socials));
     if (!s.gear) s.gear = JSON.parse(JSON.stringify(defaultState.gear));
     if (!s.gearSection) s.gearSection = JSON.parse(JSON.stringify(defaultState.gearSection));
+    if (!s.companyName) s.companyName = defaultState.companyName;
     return s;
   }
   siteRef.once('value').then(snap => {
