@@ -67,6 +67,13 @@
   .thumb{ width:100%; height:90px; object-fit:cover; border-radius:3px; margin-bottom:8px; display:none; border:1px solid var(--a-line); }
 
   .item-card{ border:1px solid var(--a-line); border-radius:4px; padding:14px; background: var(--a-panel-2); display:flex; flex-direction:column; gap:10px; position:relative; }
+  .booking-entry{ border:1px solid var(--a-line); border-radius:4px; padding:12px 14px; background:var(--a-panel-2); margin-bottom:10px; position:relative; }
+  .booking-entry .bk-when{ font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--a-gold-bright); margin-bottom:6px; }
+  .booking-entry .bk-name{ font-weight:600; font-size:14px; margin-bottom:4px; }
+  .booking-entry .bk-contact{ font-size:12px; color:var(--a-dim); line-height:1.5; }
+  .booking-entry .bk-delete{ position:absolute; top:10px; right:10px; background:none; border:none; color:var(--a-dim); cursor:pointer; font-size:16px; line-height:1; }
+  .booking-entry .bk-delete:hover{ color:#c0473a; }
+  .booking-entry.past{ opacity:.5; }
   .item-card .remove{ position:absolute; top:8px; right:8px; background:none; border:none; color: var(--a-dim); cursor:pointer; font-size:16px; line-height:1; }
   .item-card .remove:hover{ color:#E89A68; }
   .add-btn{ align-self:flex-start; }
@@ -113,6 +120,14 @@
       <button class="btn btn-danger" id="resetBtn">Reset draft to last-published content</button>
     </div>
     <div class="hint" style="padding:0 22px 14px;">Editing here only updates your draft in this browser. Nothing goes live until you export this file and send it back to Claude to publish.</div>
+
+    <details open>
+      <summary>📅 Bookings</summary>
+      <div class="panel">
+        <div class="hint">Live from the site's booking form — this list updates on its own, no export needed.</div>
+        <div id="bookingsPanel">Loading…</div>
+      </div>
+    </details>
 
     <details open>
       <summary>Company name</summary>
@@ -289,6 +304,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const adminRef = db.ref('goldbear/admin');
+const bookingsRef = db.ref('bookings');
 
 /* ============================================================
    STATE
@@ -1272,6 +1288,32 @@ function showApp(){
   } catch (e) {}
   initSidebar();
   document.getElementById('preview').srcdoc = renderSite(state);
+  initBookingsPanel();
+}
+
+function initBookingsPanel(){
+  bookingsRef.on('value', snap => {
+    const el = document.getElementById('bookingsPanel');
+    const entries = [];
+    snap.forEach(child => entries.push({ id: child.key, ...child.val() }));
+    if (!entries.length) { el.innerHTML = '<div class="hint">No bookings yet.</div>'; return; }
+    entries.sort((a,b) => (a.date + a.time).localeCompare(b.date + b.time));
+    const todayStr = new Date().toISOString().slice(0,10);
+    el.innerHTML = entries.map(b => {
+      const isPast = b.date < todayStr;
+      return `<div class="booking-entry${isPast ? ' past' : ''}">
+        <button class="bk-delete" data-id="${b.id}" title="Delete booking">×</button>
+        <div class="bk-when">${esc(b.date)} · ${esc(b.time)}</div>
+        <div class="bk-name">${esc(b.name)}</div>
+        <div class="bk-contact">${esc(b.email)}<br>${esc(b.phone)}</div>
+      </div>`;
+    }).join('');
+    el.querySelectorAll('.bk-delete').forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (confirm('Delete this booking?')) bookingsRef.child(btn.dataset.id).remove();
+      });
+    });
+  });
 }
 function showLogin(){
   document.getElementById('login-screen').style.display = 'flex';

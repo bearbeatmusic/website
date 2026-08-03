@@ -89,6 +89,20 @@
   .modal-close{ position:absolute; top:18px; right:18px; width:36px; height:36px; border-radius:50%; border:1px solid var(--line); background:transparent; color:var(--cream-dim); font-size:22px; line-height:1; cursor:pointer; display:flex; align-items:center; justify-content:center; }
   .modal-close:hover{ border-color:var(--gold); color:var(--gold-bright); }
   @media (max-width:600px){ .modal-box{ padding:36px 24px; } }
+  .booking-form{ margin-top:36px; display:flex; flex-direction:column; gap:20px; }
+  .booking-row{ display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  .booking-field label{ display:block; font-family:var(--font-mono); font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--cream-dim); margin-bottom:8px; }
+  .booking-field input{ width:100%; background:var(--bg-panel); border:1px solid var(--line); border-radius:4px; padding:12px 14px; color:var(--cream); font-family:var(--font-body); font-size:15px; }
+  .booking-field input:focus{ outline:none; border-color:var(--gold); }
+  .booking-slots{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+  .booking-slot-btn{ border:1px solid var(--line); border-radius:4px; padding:12px; background:var(--bg-panel); color:var(--cream); font-family:var(--font-mono); font-size:13px; cursor:pointer; }
+  .booking-slot-btn:hover{ border-color:var(--gold); }
+  .booking-slot-btn.selected{ border-color:var(--gold); background:rgba(200,155,60,0.12); color:var(--gold-bright); }
+  .booking-slot-btn.taken{ opacity:.4; cursor:not-allowed; text-decoration:line-through; }
+  .booking-slots-hint{ grid-column:1/-1; color:var(--cream-dim); font-size:14px; font-style:italic; }
+  .booking-error{ color:#c0473a; font-size:13px; min-height:18px; }
+  .booking-success{ text-align:center; padding:20px 0; }
+  @media (max-width:560px){ .booking-row{ grid-template-columns:1fr; } .booking-slots{ grid-template-columns:1fr; } }
   .price-card{ border:1px solid var(--line); padding:44px 40px; background:var(--bg); position:relative; }
   .price-card.featured{ border-color:var(--gold); background:linear-gradient(165deg,rgba(200,155,60,0.08),var(--bg) 60%); }
   .price-card.featured::before{ content:'RECOMMENDED'; position:absolute; top:-1px; right:-1px; background:var(--gold); color:var(--bg); font-family:var(--font-mono); font-size:10.5px; letter-spacing:.1em; padding:7px 14px; }
@@ -166,6 +180,10 @@
     .contact-methods{ flex-direction:column; align-items:center; }
   }
 </style>
+<!-- Firebase is used only for the booking system below (storing/checking
+     appointment slots) — the rest of this page's content is static. -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 </head>
 <body>
 
@@ -175,7 +193,7 @@
     <div class="navlinks">
       <a href="#about" data-i18n="navAbout">About</a><a href="#services" data-i18n="navServices">Services</a><a href="#" class="roster-trigger" data-i18n="navProcess">Process</a><a href="#catalog" data-i18n="navCatalog">Catalog</a><a href="#artists" data-i18n="navArtists">Artists</a><a href="#contact" data-i18n="navContact">Contact</a>
     </div>
-    <a href="#contact" class="nav-cta" data-i18n="navCta">Book a session</a>
+    <a href="#" class="nav-cta booking-trigger" data-i18n="navCta">Book a session</a>
     <button class="lang-toggle" id="lang-toggle" type="button" aria-label="Switch language">EN / ES</button>
   </nav>
 </header>
@@ -278,7 +296,7 @@
           <li>Certified vocal coach present for the session</li>
           <li>Delivered ready to release, no strings attached</li>
         </ul>
-        <a href="#contact" class="btn btn-outline" id="p1-btn">Book a song</a>
+        <a href="#" class="btn btn-outline booking-trigger" id="p1-btn">Book a song</a>
       </div>
       <div class="price-card featured">
         <div class="tier">Monthly Membership</div>
@@ -345,9 +363,53 @@
     </div>
     <div class="roster-note" id="rp-note">Everything through Sound Design can happen on-site or over a video call — whatever works best for you.</div>
     <div class="roster-cta">
-      <a href="#contact" class="btn btn-primary" id="rp-cta-btn">Join the roster</a>
+      <a href="#" class="btn btn-primary" id="rp-cta-btn">Join the roster</a>
     </div>
   
+  </div>
+</div>
+
+<div class="modal-overlay" id="booking-modal-overlay">
+  <div class="modal-box" role="dialog" aria-modal="true">
+    <button class="modal-close" id="booking-modal-close" aria-label="Close">&times;</button>
+    <div class="about-head">
+      <div class="eyebrow" data-i18n="bookingEyebrow">Book a session</div>
+      <h2 data-i18n="bookingHeading">Pick a date and time.</h2>
+      <p data-i18n="bookingSub">Sessions run Monday–Friday, 10am–6pm, in 2-hour blocks. We'll confirm by email or phone.</p>
+    </div>
+    <form id="booking-form" class="booking-form" novalidate>
+      <div class="booking-field">
+        <label data-i18n="bookingLabelName">Name</label>
+        <input type="text" id="booking-name" autocomplete="name" required>
+      </div>
+      <div class="booking-row">
+        <div class="booking-field">
+          <label data-i18n="bookingLabelEmail">Email</label>
+          <input type="email" id="booking-email" autocomplete="email" required>
+        </div>
+        <div class="booking-field">
+          <label data-i18n="bookingLabelPhone">Phone</label>
+          <input type="tel" id="booking-phone" autocomplete="tel" required>
+        </div>
+      </div>
+      <div class="booking-field">
+        <label data-i18n="bookingLabelDate">Date</label>
+        <input type="date" id="booking-date" required>
+      </div>
+      <div class="booking-field">
+        <label data-i18n="bookingLabelTime">Available times</label>
+        <div class="booking-slots" id="booking-slots">
+          <div class="booking-slots-hint" id="booking-slots-hint" data-i18n="bookingPickDate">Pick a date to see available times.</div>
+        </div>
+      </div>
+      <div class="booking-error" id="booking-error"></div>
+      <button type="submit" class="btn btn-primary" id="booking-submit" data-i18n="bookingSubmit">Confirm booking</button>
+    </form>
+    <div class="booking-success" id="booking-success" style="display:none;">
+      <div class="eyebrow" style="justify-content:center;" data-i18n="bookingSuccessEyebrow">You're booked</div>
+      <h2 data-i18n="bookingSuccessHeading">See you then.</h2>
+      <p id="booking-success-detail"></p>
+    </div>
   </div>
 </div>
 
@@ -445,6 +507,23 @@
   function initials(name){ return (name||"").trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase() || "?"; }
 
   /* ============================================================
+     BOOKING DATABASE CONNECTION
+     Only used for reading/writing appointment slots below — the
+     rest of the page's content is static and does not use this.
+     ============================================================ */
+  const firebaseConfig = {
+    apiKey: "PASTE_YOUR_API_KEY",
+    authDomain: "bearbeatmusic-5f655.firebaseapp.com",
+    databaseURL: "https://bearbeatmusic-5f655-default-rtdb.firebaseio.com",
+    projectId: "bearbeatmusic-5f655",
+    storageBucket: "bearbeatmusic-5f655.appspot.com",
+    messagingSenderId: "PASTE_ID",
+    appId: "PASTE_APP_ID"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const bookingsRef = firebase.database().ref('bookings');
+
+  /* ============================================================
      LANGUAGE / i18n
      ============================================================ */
   const UI_STRINGS = {
@@ -458,7 +537,16 @@
       contactLede:"Tell us what you're working on. We'll set up a session and take it from a demo to something you'd put your name on.",
       contactBtn:"Email us", contactLabelEmail:"Email", contactLabelInstagram:"Instagram", contactLabelLocation:"Based in",
       artistLinkInstagram:"Instagram", artistLinkListen:"Listen",
-      playTrack:"Play track", modalClose:"Close", langToggle:"EN / ES"
+      playTrack:"Play track", modalClose:"Close", langToggle:"EN / ES",
+      bookingEyebrow:"Book a session", bookingHeading:"Pick a date and time.",
+      bookingSub:"Sessions run Monday–Friday, 10am–6pm, in 2-hour blocks. We'll confirm by email or phone.",
+      bookingLabelName:"Name", bookingLabelEmail:"Email", bookingLabelPhone:"Phone", bookingLabelDate:"Date", bookingLabelTime:"Available times",
+      bookingPickDate:"Pick a date to see available times.", bookingWeekendError:"We're only bookable Monday through Friday — pick a weekday.",
+      bookingNoSlots:"No times left that day — try another date.", bookingLoadingSlots:"Checking availability…",
+      bookingSubmit:"Confirm booking", bookingSubmitting:"Booking…",
+      bookingErrFields:"Please fill in your name, email, and phone.", bookingErrSlot:"Please pick an available time.", bookingErrGeneric:"Something went wrong — please try again.",
+      bookingSuccessEyebrow:"You're booked", bookingSuccessHeading:"See you then.",
+      bookingSuccessDetail:"We'll reach out to {email} or {phone} to confirm."
     },
     es: {
       navAbout:"Nosotros", navServices:"Servicios", navProcess:"Proceso", navCatalog:"Catálogo", navArtists:"Artistas", navContact:"Contacto", navCta:"Agenda una sesión",
@@ -470,7 +558,16 @@
       contactLede:"Cuéntanos en qué estás trabajando. Armaremos una sesión y lo llevaremos de un demo a algo con tu nombre.",
       contactBtn:"Escríbenos", contactLabelEmail:"Correo", contactLabelInstagram:"Instagram", contactLabelLocation:"Ubicados en",
       artistLinkInstagram:"Instagram", artistLinkListen:"Escuchar",
-      playTrack:"Reproducir canción", modalClose:"Cerrar", langToggle:"EN / ES"
+      playTrack:"Reproducir canción", modalClose:"Cerrar", langToggle:"EN / ES",
+      bookingEyebrow:"Agenda una sesión", bookingHeading:"Elige una fecha y hora.",
+      bookingSub:"Las sesiones son de lunes a viernes, de 10am a 6pm, en bloques de 2 horas. Confirmaremos por correo o teléfono.",
+      bookingLabelName:"Nombre", bookingLabelEmail:"Correo", bookingLabelPhone:"Teléfono", bookingLabelDate:"Fecha", bookingLabelTime:"Horarios disponibles",
+      bookingPickDate:"Elige una fecha para ver los horarios disponibles.", bookingWeekendError:"Solo agendamos de lunes a viernes — elige un día entre semana.",
+      bookingNoSlots:"No quedan horarios ese día — prueba otra fecha.", bookingLoadingSlots:"Revisando disponibilidad…",
+      bookingSubmit:"Confirmar reserva", bookingSubmitting:"Reservando…",
+      bookingErrFields:"Por favor completa tu nombre, correo y teléfono.", bookingErrSlot:"Por favor elige un horario disponible.", bookingErrGeneric:"Algo salió mal — inténtalo de nuevo.",
+      bookingSuccessEyebrow:"Ya quedaste agendado", bookingSuccessHeading:"Nos vemos entonces.",
+      bookingSuccessDetail:"Te contactaremos a {email} o {phone} para confirmar."
     }
   };
   const SPANISH_COUNTRIES = new Set(["MX","ES","AR","CO","CL","PE","VE","EC","GT","CU","BO","DO","HN","PY","SV","NI","CR","PA","UY","GQ","PR"]);
@@ -782,7 +879,126 @@
   document.getElementById('roster-modal-close').addEventListener('click', closeRosterModal);
   rosterOverlay.addEventListener('click', (e) => { if (e.target === rosterOverlay) closeRosterModal(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeRosterModal(); });
-  document.getElementById('rp-cta-btn').addEventListener('click', closeRosterModal);
+  document.getElementById('rp-cta-btn').addEventListener('click', (e) => { e.preventDefault(); closeRosterModal(); openBookingModal(); });
+
+  /* ============================================================
+     BOOKING MODAL
+     ============================================================ */
+  const SESSION_SLOTS = ['10:00','12:00','14:00','16:00']; // 2-hour blocks, 10am–6pm
+  const bookingOverlay = document.getElementById('booking-modal-overlay');
+  const bookingForm = document.getElementById('booking-form');
+  const bookingSuccess = document.getElementById('booking-success');
+  const bookingDateInput = document.getElementById('booking-date');
+  const bookingSlotsEl = document.getElementById('booking-slots');
+  const bookingErrorEl = document.getElementById('booking-error');
+  const bookingSubmitBtn = document.getElementById('booking-submit');
+  let selectedSlot = null;
+
+  function openBookingModal(){
+    bookingOverlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    bookingForm.style.display = '';
+    bookingSuccess.style.display = 'none';
+    bookingErrorEl.textContent = '';
+    const today = new Date();
+    bookingDateInput.min = today.toISOString().slice(0,10);
+  }
+  function closeBookingModal(){
+    bookingOverlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  document.querySelectorAll('.booking-trigger').forEach(el => {
+    el.addEventListener('click', (e) => { e.preventDefault(); openBookingModal(); });
+  });
+  document.getElementById('booking-modal-close').addEventListener('click', closeBookingModal);
+  bookingOverlay.addEventListener('click', (e) => { if (e.target === bookingOverlay) closeBookingModal(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && bookingOverlay.classList.contains('open')) closeBookingModal(); });
+
+  function formatSlotLabel(time){
+    const [h] = time.split(':').map(Number);
+    const end = h + 2;
+    const fmt = (hr) => { const period = hr >= 12 ? 'PM' : 'AM'; const h12 = ((hr + 11) % 12) + 1; return `${h12}${period}`; };
+    return `${fmt(h)} – ${fmt(end)}`;
+  }
+
+  function renderBookingSlots(taken){
+    selectedSlot = null;
+    bookingSlotsEl.innerHTML = SESSION_SLOTS.map(time => {
+      const isTaken = taken.includes(time);
+      return `<button type="button" class="booking-slot-btn${isTaken ? ' taken' : ''}" data-time="${time}" ${isTaken ? 'disabled' : ''}>${formatSlotLabel(time)}</button>`;
+    }).join('');
+    if (SESSION_SLOTS.every(t => taken.includes(t))) {
+      bookingSlotsEl.innerHTML += `<div class="booking-slots-hint">${UI_STRINGS[currentLang].bookingNoSlots}</div>`;
+    }
+    bookingSlotsEl.querySelectorAll('.booking-slot-btn:not(.taken)').forEach(btn => {
+      btn.addEventListener('click', () => {
+        bookingSlotsEl.querySelectorAll('.booking-slot-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedSlot = btn.dataset.time;
+      });
+    });
+  }
+
+  bookingDateInput.addEventListener('change', () => {
+    const val = bookingDateInput.value;
+    bookingErrorEl.textContent = '';
+    if (!val) return;
+    const day = new Date(val + 'T00:00:00').getDay(); // 0 = Sun, 6 = Sat
+    if (day === 0 || day === 6) {
+      bookingSlotsEl.innerHTML = `<div class="booking-slots-hint">${UI_STRINGS[currentLang].bookingWeekendError}</div>`;
+      selectedSlot = null;
+      return;
+    }
+    bookingSlotsEl.innerHTML = `<div class="booking-slots-hint">${UI_STRINGS[currentLang].bookingLoadingSlots}</div>`;
+    bookingsRef.orderByChild('date').equalTo(val).once('value')
+      .then(snap => {
+        const taken = [];
+        snap.forEach(child => { taken.push(child.val().time); });
+        renderBookingSlots(taken);
+      })
+      .catch(() => { renderBookingSlots([]); }); // if it can't check, still allow booking rather than blocking
+  });
+
+  bookingForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    bookingErrorEl.textContent = '';
+    const name = document.getElementById('booking-name').value.trim();
+    const email = document.getElementById('booking-email').value.trim();
+    const phone = document.getElementById('booking-phone').value.trim();
+    const date = bookingDateInput.value;
+    if (!name || !email || !phone) { bookingErrorEl.textContent = UI_STRINGS[currentLang].bookingErrFields; return; }
+    if (!date || !selectedSlot) { bookingErrorEl.textContent = UI_STRINGS[currentLang].bookingErrSlot; return; }
+
+    bookingSubmitBtn.disabled = true;
+    bookingSubmitBtn.textContent = UI_STRINGS[currentLang].bookingSubmitting;
+
+    // Re-check the slot hasn't been taken by someone else in the meantime.
+    bookingsRef.orderByChild('date').equalTo(date).once('value')
+      .then(snap => {
+        let stillOpen = true;
+        snap.forEach(child => { if (child.val().time === selectedSlot) stillOpen = false; });
+        if (!stillOpen) throw new Error('slot_taken');
+        return bookingsRef.push({ name, email, phone, date, time: selectedSlot, createdAt: Date.now() });
+      })
+      .then(() => {
+        bookingForm.style.display = 'none';
+        bookingSuccess.style.display = '';
+        document.getElementById('booking-success-detail').textContent =
+          UI_STRINGS[currentLang].bookingSuccessDetail.replace('{email}', email).replace('{phone}', phone);
+      })
+      .catch((err) => {
+        if (err && err.message === 'slot_taken') {
+          bookingErrorEl.textContent = UI_STRINGS[currentLang].bookingNoSlots;
+          bookingDateInput.dispatchEvent(new Event('change'));
+        } else {
+          bookingErrorEl.textContent = UI_STRINGS[currentLang].bookingErrGeneric;
+        }
+      })
+      .finally(() => {
+        bookingSubmitBtn.disabled = false;
+        bookingSubmitBtn.textContent = UI_STRINGS[currentLang].bookingSubmit;
+      });
+  });
 
   function wireTrackButtons(){
     document.querySelectorAll('.track').forEach(track => {
