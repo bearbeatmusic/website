@@ -7,7 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://www.gstatic.com">
-<link rel="preconnect" href="https://bearbeatmusic-5f655-default-rtdb.firebaseio.com">
 <link rel="preconnect" href="https://w.soundcloud.com">
 <link id="google-fonts-link" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@300;400;500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -440,20 +439,8 @@
 <!-- ============================================================
      FIREBASE — paste the SAME config here and in admin.html
      ============================================================ -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <script src="https://w.soundcloud.com/player/api.js"></script>
 <script>
-  const firebaseConfig = {
-    apiKey: "PASTE_YOUR_API_KEY",
-    authDomain: "bearbeatmusic-5f655.firebaseapp.com",
-    databaseURL: "https://bearbeatmusic-5f655-default-rtdb.firebaseio.com",
-    projectId: "bearbeatmusic-5f655",
-    storageBucket: "bearbeatmusic-5f655.appspot.com",
-    messagingSenderId: "PASTE_ID",
-    appId: "PASTE_APP_ID"
-  };
-
   function esc(str){ return str === undefined || str === null ? "" : String(str); }
   function initials(name){ return (name||"").trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase() || "?"; }
 
@@ -853,24 +840,287 @@
   });
   detectLanguage();
 
-  // Connect to Firebase and listen for live updates — the page updates
-  // automatically the instant something changes in the admin page.
-  if (firebaseConfig.databaseURL && !firebaseConfig.databaseURL.includes('PASTE_YOUR_PROJECT')) {
-    // Show the last-known content immediately (if this visitor has been here
-    // before) so the page doesn't sit on placeholder content while Firebase
-    // responds. It's then replaced by the live version the moment it arrives.
-    try {
-      const cached = localStorage.getItem('goldbear_site_cache');
-      if (cached) applyState(JSON.parse(cached));
-    } catch (e) {}
-
-    firebase.initializeApp(firebaseConfig);
-    firebase.database().ref('goldbear/site').on('value', snap => {
-      const data = snap.val();
-      applyState(data);
-      try { if (data) localStorage.setItem('goldbear_site_cache', JSON.stringify(data)); } catch (e) {}
-    });
-  }
+  // Site content is baked directly into this file — no live database
+  // connection. To publish changes, edit content in admin.html, export it,
+  // and send the export back to have it rebuilt into this file.
+  const SITE_DATA = {
+  "about": {
+    "body": "Bearbeat Music is an independent incubator for musicians at the beginning of something. We're producers, engineers, and vocal coaches who work on the song and the artist behind it at the same time — because a great take means nothing if nobody knows whose it is.",
+    "eyebrow": "Who we are",
+    "heading": "Built for artists who are almost there."
+  },
+  "artists": [
+    {
+      "bio": "Pop Rock artist with  some Electro pop ",
+      "genre": "Mexico City",
+      "instagram": "https://www.instagram.com/hanny.montenegro/",
+      "listen": "https://open.spotify.com/artist/4T9wGQw5iNYtL3DfikMZze?si=skMIEYEPQKSxZqtTYt0WFw",
+      "name": "Hanny Montenegro",
+      "photo": "images/artist-hanny-montenegro.jpg"
+    },
+    {
+      "bio": "RnB Pop artist ",
+      "genre": "Chicago",
+      "instagram": "https://www.instagram.com/casey_musk?utm_source=qr",
+      "listen": "https://open.spotify.com/artist/4injwvBORmulWge8snqAZ3?si=5yAgmFqUS8apycmFVoNiaA",
+      "name": "Casey PRKER",
+      "photo": "images/artist-casey-prker.jpg"
+    }
+  ],
+  "companyName": "Bearbeat Music",
+  "contact": {
+    "email": "goldbearmusic@gmail.com",
+    "instagram": "@goldbearmusic",
+    "location": "Chicago / Mexico City"
+  },
+  "footer": {
+    "text": "© 2026 Goldbear Productions"
+  },
+  "gear": [
+    {
+      "category": "Software",
+      "image": "images/gear-pro-tools.jpg",
+      "name": "Pro Tools"
+    },
+    {
+      "category": "Hardware",
+      "image": "images/gear-akg-c414xl.jpg",
+      "name": "AKG C414XL"
+    },
+    {
+      "category": "Software",
+      "image": "images/gear-waves-plugins.jpg",
+      "name": "Waves Plugins"
+    },
+    {
+      "category": "Software",
+      "image": "images/gear-auto-tune.png",
+      "name": "Auto-Tune"
+    },
+    {
+      "category": "Hardware",
+      "image": "images/gear-audient-id24.jpg",
+      "name": "Audient iD24"
+    },
+    {
+      "category": "Hardware",
+      "image": "images/gear-shure-sm7b.jpg",
+      "name": "Shure SM7B"
+    },
+    {
+      "category": "Software",
+      "image": "images/gear-logic-pro-x.jpg",
+      "name": "Logic Pro X"
+    },
+    {
+      "category": "Hardware",
+      "image": "images/gear-krk-rokit-5.png",
+      "name": "KRK Rokit 5"
+    },
+    {
+      "category": "Software",
+      "image": "images/gear-serum-2.webp",
+      "name": "Serum 2"
+    },
+    {
+      "category": "Software",
+      "image": "images/gear-splice.png",
+      "name": "Splice"
+    },
+    {
+      "category": "Hardware",
+      "image": "images/gear-mustang-bass.png",
+      "name": "Mustang Bass"
+    },
+    {
+      "category": "Hardware",
+      "image": "images/gear-martin-co-junior.png",
+      "name": "Martin & Co Junior "
+    },
+    {
+      "category": "Hardware",
+      "image": "images/gear-squier-telecarter.jpg",
+      "name": "Squier Telecarter"
+    },
+    {
+      "category": "Software",
+      "image": "images/gear-melodyne.webp",
+      "name": "Melodyne"
+    }
+  ],
+  "gearSection": {
+    "body": "The same hardware and software behind every session, so what you hear in the room is what you hear on the release.",
+    "eyebrow": "The studio",
+    "heading": "What we record and mix with."
+  },
+  "hero": {
+    "cta1": "See pricing",
+    "cta2": "Hear the catalog",
+    "em": "the artist",
+    "eyebrow": "Independent Artist Incubator",
+    "headline": "We produce the artist, not just the song.",
+    "sub": "Bearbeat Music pairs full studio production with real artist development, so every release you put your name on sounds finished — not just recorded."
+  },
+  "pricing": {
+    "membership": {
+      "btn": "Join the roster",
+      "features": [
+        "One cover + one original song, fully mixed & mastered — every two months",
+        "Certified vocal coach present for every recording session",
+        "Ongoing artistic development of your sound and direction",
+        "Full brand & artist development"
+      ],
+      "price": "$299/mo",
+      "sub": "Ongoing · for artists building a catalog"
+    },
+    "perSong": {
+      "btn": "Book a song",
+      "features": [
+        "One song, fully produced from the ground up",
+        "Professional mixing & mastering",
+        "Certified vocal coach present for the session",
+        "Delivered ready to release, no strings attached"
+      ],
+      "price": "$599",
+      "sub": "One-time · pay per track"
+    }
+  },
+  "process": [
+    {
+      "body": "In-studio sessions with a certified vocal coach on every take, so the performance is right before it's ever mixed.",
+      "title": "Record"
+    },
+    {
+      "body": "Sound, image, and story worked on alongside the music. We treat your brand as part of the production, not an afterthought.",
+      "title": "Develop"
+    },
+    {
+      "body": "Every song leaves the building fully mixed and mastered — ready to put your name on and put out into the world.",
+      "title": "Release"
+    }
+  ],
+  "rosterProcess": {
+    "ctaBtn": "Book a free session",
+    "eyebrow": "How it works",
+    "heading": "From vision to release.",
+    "intro": "Here's exactly what happens once you join the roster — start to finish.",
+    "note": "Everything through Sound Design can happen on-site or over a video call — whatever works best for you.",
+    "steps": [
+      {
+        "body": "We analyze your project and set a vision, understanding where it's going before anything gets recorded.",
+        "title": "Vision & Direction"
+      },
+      {
+        "body": "We figure out what kind of songs fit your project and where it should sit sonically.",
+        "title": "Sound Reference"
+      },
+      {
+        "body": "We explore and settle on the best sounds and textures for the track.",
+        "title": "Sound Design"
+      },
+      {
+        "body": "We write the song together and put together drafts, shaping it into something worth recording. You get your first Demo ready.",
+        "title": "Songwriting Sessions"
+      },
+      {
+        "body": "Vocals are recorded professionally in the studio, with a certified vocal coach in the room.",
+        "title": "Vocal Recording"
+      },
+      {
+        "body": "We revise the song for any mistakes and schedule a re-recording session if anything needs another pass.",
+        "title": "Review"
+      },
+      {
+        "body": "The song goes to our mix and master engineer, with unlimited revisions until it's ready for platforms.",
+        "title": "Mix & Master"
+      },
+      {
+        "body": "We link every social media account to your artist profile so everything points back to you.",
+        "title": "Social Setup"
+      },
+      {
+        "body": "We find a song that fits your sound, record it professionally, and distribute it to platforms.",
+        "title": "Song Cover "
+      },
+      {
+        "body": "We distribute your song to every platform, 20 days ahead of release — enough time to run a real promotion campaign.",
+        "title": "Distribution"
+      }
+    ]
+  },
+  "socials": [
+    {
+      "platform": "instagram",
+      "url": "https://www.instagram.com/bearbeat.music/"
+    },
+    {
+      "platform": "tiktok",
+      "url": "https://tiktok.com/@goldbearproductions"
+    },
+    {
+      "platform": "spotify",
+      "url": "https://open.spotify.com/playlist/2QwoDgytu4ddDRtJvsWJc7?si=TE3O6xriQoi5BH0J1ud06g"
+    }
+  ],
+  "theme": {
+    "bg": "#fcfcfc",
+    "bgPanel": "#ffffff",
+    "bgPanel2": "#221B14",
+    "bodyFont": "Manrope",
+    "bronze": "#8B5A2B",
+    "cream": "#a1a1a1",
+    "creamDim": "#B9AE9B",
+    "displayFont": "Fraunces",
+    "gold": "#b68c2f",
+    "goldBright": "#b08927",
+    "heroBgImage": "",
+    "logoImage": "images/logo.png",
+    "monoFont": "JetBrains Mono"
+  },
+  "tracks": [
+    {
+      "appleMusicUrl": "",
+      "artist": "Produced by Goldbear",
+      "audioUrl": "",
+      "duration": "0:00",
+      "soundcloudUrl": "",
+      "spotifyUrl": "https://open.spotify.com/track/7b3T4vA3ayqdZ7l3q8NjwI?si=adbabb8ad8644f3b",
+      "tag": "Original",
+      "title": "Ill be there for you"
+    },
+    {
+      "appleMusicUrl": "",
+      "artist": "Produced by Goldbear",
+      "audioUrl": "",
+      "duration": "0:00",
+      "soundcloudUrl": "",
+      "spotifyUrl": "https://open.spotify.com/track/60FPgKTYGzSS6eCQqD34kN?si=ab4ae02be4d54641",
+      "tag": "Original",
+      "title": "Let it be us"
+    },
+    {
+      "appleMusicUrl": "",
+      "artist": "Produced by Goldbear",
+      "audioUrl": "",
+      "duration": "0:00",
+      "soundcloudUrl": "",
+      "spotifyUrl": "https://open.spotify.com/track/3nTDRP56N60W1tMxdOXQm2?si=c7b53be0a03b4e8c",
+      "tag": "Original",
+      "title": "Hey you listen"
+    },
+    {
+      "appleMusicUrl": "",
+      "artist": "Hanny Mon",
+      "audioUrl": "",
+      "duration": "0:00",
+      "soundcloudUrl": "",
+      "spotifyUrl": "https://open.spotify.com/track/66yYKYpkT9yP6ChR8mB5uw?si=ef22617bbdd240c8",
+      "tag": "Original",
+      "title": "Hold Me"
+    }
+  ]
+};
+  applyState(SITE_DATA);
 </script>
 </body>
 </html>
