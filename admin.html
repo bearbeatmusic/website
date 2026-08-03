@@ -158,6 +158,13 @@
         <div class="hint">The emphasis text is styled in italic gold, if it appears within the headline.</div>
         <div class="field"><label>Subheading</label><textarea id="h_sub"></textarea></div>
         <div class="row2"><div class="field"><label>Primary button</label><input type="text" id="h_cta1"></div><div class="field"><label>Secondary button</label><input type="text" id="h_cta2"></div></div>
+        <hr style="border-color:var(--a-line);width:100%;margin:10px 0;">
+        <strong style="font-size:12px;color:var(--a-gold-bright);">🇪🇸 Spanish version</strong>
+        <div class="field"><label>Eyebrow label (ES)</label><input type="text" id="h_eyebrow_es"></div>
+        <div class="field"><label>Headline (ES)</label><textarea id="h_headline_es"></textarea></div>
+        <div class="field"><label>Headline emphasis (ES)</label><input type="text" id="h_em_es"></div>
+        <div class="field"><label>Subheading (ES)</label><textarea id="h_sub_es"></textarea></div>
+        <div class="row2"><div class="field"><label>Primary button (ES)</label><input type="text" id="h_cta1_es"></div><div class="field"><label>Secondary button (ES)</label><input type="text" id="h_cta2_es"></div></div>
       </div>
     </details>
 
@@ -167,6 +174,11 @@
         <div class="field"><label>Eyebrow</label><input type="text" id="a_eyebrow"></div>
         <div class="field"><label>Heading</label><input type="text" id="a_heading"></div>
         <div class="field"><label>Body</label><textarea id="a_body"></textarea></div>
+        <hr style="border-color:var(--a-line);width:100%;margin:10px 0;">
+        <strong style="font-size:12px;color:var(--a-gold-bright);">🇪🇸 Spanish version</strong>
+        <div class="field"><label>Eyebrow (ES)</label><input type="text" id="a_eyebrow_es"></div>
+        <div class="field"><label>Heading (ES)</label><input type="text" id="a_heading_es"></div>
+        <div class="field"><label>Body (ES)</label><textarea id="a_body_es"></textarea></div>
       </div>
     </details>
 
@@ -178,6 +190,11 @@
         <div class="field"><label>Eyebrow</label><input type="text" id="g_eyebrow"></div>
         <div class="field"><label>Heading</label><input type="text" id="g_heading"></div>
         <div class="field"><label>Body</label><textarea id="g_body"></textarea></div>
+        <hr style="border-color:var(--a-line);width:100%;margin:10px 0;">
+        <strong style="font-size:12px;color:var(--a-gold-bright);">🇪🇸 Spanish version</strong>
+        <div class="field"><label>Eyebrow (ES)</label><input type="text" id="g_eyebrow_es"></div>
+        <div class="field"><label>Heading (ES)</label><input type="text" id="g_heading_es"></div>
+        <div class="field"><label>Body (ES)</label><textarea id="g_body_es"></textarea></div>
         <div id="gearPanel"></div>
       </div>
     </details>
@@ -190,12 +207,18 @@
         <div class="field"><label>Subtext</label><input type="text" id="p1_sub"></div>
         <div class="field"><label>Features (one per line)</label><textarea id="p1_features" style="min-height:110px;"></textarea></div>
         <div class="field"><label>Button label</label><input type="text" id="p1_btn"></div>
+        <div class="field"><label>Subtext (ES)</label><input type="text" id="p1_sub_es"></div>
+        <div class="field"><label>Features (ES, one per line)</label><textarea id="p1_features_es" style="min-height:110px;"></textarea></div>
+        <div class="field"><label>Button label (ES)</label><input type="text" id="p1_btn_es"></div>
         <hr style="border-color:var(--a-line);width:100%;margin:6px 0;">
         <strong style="font-size:12px;color:var(--a-gold-bright);">Monthly Membership</strong>
         <div class="field"><label>Price</label><input type="text" id="p2_price"></div>
         <div class="field"><label>Subtext</label><input type="text" id="p2_sub"></div>
         <div class="field"><label>Features (one per line)</label><textarea id="p2_features" style="min-height:110px;"></textarea></div>
         <div class="field"><label>Button label</label><input type="text" id="p2_btn"></div>
+        <div class="field"><label>Subtext (ES)</label><input type="text" id="p2_sub_es"></div>
+        <div class="field"><label>Features (ES, one per line)</label><textarea id="p2_features_es" style="min-height:110px;"></textarea></div>
+        <div class="field"><label>Button label (ES)</label><input type="text" id="p2_btn_es"></div>
       </div>
     </details>
 
@@ -208,6 +231,13 @@
         <div id="rosterStepsPanel"></div>
         <div class="field"><label>Note (e.g. on-site / video call)</label><textarea id="rp_note"></textarea></div>
         <div class="field"><label>Bottom CTA button</label><input type="text" id="rp_ctaBtn"></div>
+        <hr style="border-color:var(--a-line);width:100%;margin:10px 0;">
+        <strong style="font-size:12px;color:var(--a-gold-bright);">🇪🇸 Spanish version</strong>
+        <div class="field"><label>Eyebrow (ES)</label><input type="text" id="rp_eyebrow_es"></div>
+        <div class="field"><label>Heading (ES)</label><input type="text" id="rp_heading_es"></div>
+        <div class="field"><label>Intro (ES)</label><textarea id="rp_intro_es"></textarea></div>
+        <div class="field"><label>Note (ES)</label><textarea id="rp_note_es"></textarea></div>
+        <div class="field"><label>Bottom CTA button (ES)</label><input type="text" id="rp_ctaBtn_es"></div>
         <div class="hint">This now opens as a popup window when someone clicks "Join the roster" or the Process nav link.</div>
       </div>
     </details>
@@ -269,31 +299,56 @@ const defaultState = {
     cream:"#F2EBDD", creamDim:"#B9AE9B", displayFont:"Fraunces", bodyFont:"Manrope", monoFont:"JetBrains Mono", logoImage:"", heroBgImage:"" },
   hero: { eyebrow:"Independent Artist Incubator — Mexico City", headline:"We produce the artist, not just the song.", em:"the artist",
     sub:"Goldbear Productions pairs full studio production with real artist development, so every release you put your name on sounds finished — not just recorded.",
-    cta1:"See pricing", cta2:"Hear the catalog" },
+    cta1:"See pricing", cta2:"Hear the catalog",
+    es:{ eyebrow:"Incubadora de Artistas Independiente — Ciudad de México", headline:"Producimos al artista, no solo la canción.", em:"al artista",
+      sub:"Goldbear Productions combina producción de estudio completa con desarrollo real de artistas, para que cada lanzamiento con tu nombre suene terminado, no solo grabado.",
+      cta1:"Ver precios", cta2:"Escuchar el catálogo" } },
   about: { eyebrow:"Who we are", heading:"Built for artists who are almost there.",
-    body:"Goldbear Productions is an independent incubator for musicians at the beginning of something. We're producers, engineers, and vocal coaches who work on the song and the artist behind it at the same time — because a great take means nothing if nobody knows whose it is." },
+    body:"Goldbear Productions is an independent incubator for musicians at the beginning of something. We're producers, engineers, and vocal coaches who work on the song and the artist behind it at the same time — because a great take means nothing if nobody knows whose it is.",
+    es:{ eyebrow:"Quiénes somos", heading:"Hecho para artistas que están a punto de lograrlo.",
+      body:"Goldbear Productions es una incubadora independiente para músicos que están comenzando algo. Somos productores, ingenieros y coaches vocales que trabajan en la canción y en el artista detrás de ella al mismo tiempo — porque una gran toma no significa nada si nadie sabe de quién es." } },
   process: [
-    { title:"Record", body:"In-studio sessions with a certified vocal coach on every take, so the performance is right before it's ever mixed." },
-    { title:"Develop", body:"Sound, image, and story worked on alongside the music. We treat your brand as part of the production, not an afterthought." },
-    { title:"Release", body:"Every song leaves the building fully mixed and mastered — ready to put your name on and put out into the world." }
+    { title:"Record", body:"In-studio sessions with a certified vocal coach on every take, so the performance is right before it's ever mixed.",
+      es:{ title:"Grabar", body:"Sesiones en estudio con un coach vocal certificado en cada toma, para que la interpretación esté lista antes de mezclarla." } },
+    { title:"Develop", body:"Sound, image, and story worked on alongside the music. We treat your brand as part of the production, not an afterthought.",
+      es:{ title:"Desarrollar", body:"Sonido, imagen e historia trabajados junto con la música. Tratamos tu marca como parte de la producción, no como un extra." } },
+    { title:"Release", body:"Every song leaves the building fully mixed and mastered — ready to put your name on and put out into the world.",
+      es:{ title:"Lanzar", body:"Cada canción sale del estudio mezclada y masterizada por completo — lista para llevar tu nombre y salir al mundo." } }
   ],
-  gearSection: { eyebrow:"The studio", heading:"What we record and mix with.", body:"The same hardware and software behind every session, so what you hear in the room is what you hear on the release." },
+  gearSection: { eyebrow:"The studio", heading:"What we record and mix with.", body:"The same hardware and software behind every session, so what you hear in the room is what you hear on the release.",
+    es:{ eyebrow:"El estudio", heading:"Con qué grabamos y mezclamos.", body:"El mismo hardware y software detrás de cada sesión, para que lo que escuchas en la sala sea lo que escuchas en el lanzamiento." } },
   rosterProcess: {
     eyebrow: "How it works",
     heading: "From vision to release.",
     intro: "Here's exactly what happens once you join the roster — start to finish.",
     note: "Everything through Sound Design can happen on-site or over a video call — whatever works best for you.",
     ctaBtn: "Join the roster",
+    es: {
+      eyebrow: "Cómo funciona",
+      heading: "De la visión al lanzamiento.",
+      intro: "Esto es exactamente lo que pasa cuando te unes al roster — de principio a fin.",
+      note: "Todo hasta el diseño de sonido puede hacerse en persona o por videollamada — lo que te funcione mejor.",
+      ctaBtn: "Únete al roster"
+    },
     steps: [
-      { title:"Vision & Direction", body:"We analyze your project and set a vision, understanding where it's going before anything gets recorded." },
-      { title:"Sound Reference", body:"We figure out what kind of songs fit your project and where it should sit sonically." },
-      { title:"Songwriting Sessions", body:"We write the song together and put together drafts, shaping it into something worth recording." },
-      { title:"Sound Design", body:"We explore and settle on the best sounds and textures for the track." },
-      { title:"Vocal Recording", body:"Vocals are recorded professionally in the studio, with a certified vocal coach in the room." },
-      { title:"Review", body:"We revise the song for any mistakes and schedule a re-recording session if anything needs another pass." },
-      { title:"Mix & Master", body:"The song goes to our mix and master engineer, with unlimited revisions until it's ready for platforms." },
-      { title:"Social Setup", body:"We link every social media account to your artist profile so everything points back to you." },
-      { title:"Distribution", body:"We distribute your song to every platform, 20 days ahead of release — enough time to run a real promotion campaign." }
+      { title:"Vision & Direction", body:"We analyze your project and set a vision, understanding where it's going before anything gets recorded.",
+        es:{ title:"Visión y Dirección", body:"Analizamos tu proyecto y definimos una visión, entendiendo hacia dónde va antes de grabar nada." } },
+      { title:"Sound Reference", body:"We figure out what kind of songs fit your project and where it should sit sonically.",
+        es:{ title:"Referencias Sonoras", body:"Definimos qué tipo de canciones encajan con tu proyecto y dónde debería ubicarse sonoramente." } },
+      { title:"Songwriting Sessions", body:"We write the song together and put together drafts, shaping it into something worth recording.",
+        es:{ title:"Sesiones de Composición", body:"Escribimos la canción juntos y armamos borradores, dándole forma hasta que valga la pena grabarla." } },
+      { title:"Sound Design", body:"We explore and settle on the best sounds and textures for the track.",
+        es:{ title:"Diseño de Sonido", body:"Exploramos y definimos los mejores sonidos y texturas para la canción." } },
+      { title:"Vocal Recording", body:"Vocals are recorded professionally in the studio, with a certified vocal coach in the room.",
+        es:{ title:"Grabación de Voz", body:"Las voces se graban profesionalmente en el estudio, con un coach vocal certificado presente." } },
+      { title:"Review", body:"We revise the song for any mistakes and schedule a re-recording session if anything needs another pass.",
+        es:{ title:"Revisión", body:"Revisamos la canción en busca de errores y agendamos una sesión de regrabación si algo lo necesita." } },
+      { title:"Mix & Master", body:"The song goes to our mix and master engineer, with unlimited revisions until it's ready for platforms.",
+        es:{ title:"Mezcla y Masterización", body:"La canción pasa a nuestro ingeniero de mezcla y masterización, con revisiones ilimitadas hasta que esté lista para plataformas." } },
+      { title:"Social Setup", body:"We link every social media account to your artist profile so everything points back to you.",
+        es:{ title:"Configuración de Redes", body:"Vinculamos cada red social a tu perfil de artista para que todo apunte de vuelta a ti." } },
+      { title:"Distribution", body:"We distribute your song to every platform, 20 days ahead of release — enough time to run a real promotion campaign.",
+        es:{ title:"Distribución", body:"Distribuimos tu canción a todas las plataformas, 20 días antes del lanzamiento — tiempo suficiente para una campaña de promoción real." } }
     ]
   },
   gear: [
@@ -306,20 +361,24 @@ const defaultState = {
   ],
   pricing: {
     perSong: { price:"$599", sub:"One-time · pay per track", btn:"Book a song",
-      features:["One song, fully produced from the ground up","Professional mixing & mastering","Certified vocal coach present for the session","Delivered ready to release, no strings attached"] },
+      features:["One song, fully produced from the ground up","Professional mixing & mastering","Certified vocal coach present for the session","Delivered ready to release, no strings attached"],
+      es:{ sub:"Pago único · por canción", btn:"Reservar una canción",
+        features:["Una canción, producida por completo desde cero","Mezcla y masterización profesional","Coach vocal certificado presente en la sesión","Entregada lista para lanzar, sin ataduras"] } },
     membership: { price:"$299/mo", sub:"Ongoing · for artists building a catalog", btn:"Join the roster",
-      features:["One cover + one original song, fully mixed & mastered — every two months","Certified vocal coach present for every recording session","Ongoing artistic development of your sound and direction","Full brand & artist development"] }
+      features:["One cover + one original song, fully mixed & mastered — every two months","Certified vocal coach present for every recording session","Ongoing artistic development of your sound and direction","Full brand & artist development"],
+      es:{ sub:"Mensual · para artistas construyendo un catálogo", btn:"Únete al roster",
+        features:["Un cover + una canción original, mezcladas y masterizadas — cada dos meses","Coach vocal certificado en cada sesión de grabación","Desarrollo artístico continuo de tu sonido y dirección","Desarrollo completo de marca y artista"] } }
   },
   tracks: [
-    { title:"Midnight Drive", artist:"Produced by Goldbear", tag:"Original", duration:"3:12", audioUrl:"" },
-    { title:"Slow Static", artist:"Produced by Goldbear", tag:"Original", duration:"2:47", audioUrl:"" },
-    { title:"Golden Hour (Cover)", artist:"Produced by Goldbear", tag:"Cover", duration:"3:38", audioUrl:"" },
-    { title:"Paper Wings", artist:"Produced by Goldbear", tag:"Original", duration:"3:05", audioUrl:"" }
+    { title:"Midnight Drive", artist:"Produced by Goldbear", tag:"Original", duration:"3:12", audioUrl:"", es:{ tag:"Original" } },
+    { title:"Slow Static", artist:"Produced by Goldbear", tag:"Original", duration:"2:47", audioUrl:"", es:{ tag:"Original" } },
+    { title:"Golden Hour (Cover)", artist:"Produced by Goldbear", tag:"Cover", duration:"3:38", audioUrl:"", es:{ tag:"Versión" } },
+    { title:"Paper Wings", artist:"Produced by Goldbear", tag:"Original", duration:"3:05", audioUrl:"", es:{ tag:"Original" } }
   ],
   artists: [
-    { name:"Artist One", genre:"Genre / City", bio:"One line on their sound and what they're working on right now.", instagram:"#", listen:"#", photo:"" },
-    { name:"Artist Two", genre:"Genre / City", bio:"One line on their sound and what they're working on right now.", instagram:"#", listen:"#", photo:"" },
-    { name:"Artist Three", genre:"Genre / City", bio:"One line on their sound and what they're working on right now.", instagram:"#", listen:"#", photo:"" }
+    { name:"Artist One", genre:"Genre / City", bio:"One line on their sound and what they're working on right now.", instagram:"#", listen:"#", photo:"", es:{ genre:"Género / Ciudad", bio:"Una línea sobre su sonido y en qué están trabajando ahora." } },
+    { name:"Artist Two", genre:"Genre / City", bio:"One line on their sound and what they're working on right now.", instagram:"#", listen:"#", photo:"", es:{ genre:"Género / Ciudad", bio:"Una línea sobre su sonido y en qué están trabajando ahora." } },
+    { name:"Artist Three", genre:"Genre / City", bio:"One line on their sound and what they're working on right now.", instagram:"#", listen:"#", photo:"", es:{ genre:"Género / Ciudad", bio:"Una línea sobre su sonido y en qué están trabajando ahora." } }
   ],
   contact: { email:"hello@goldbearproductions.com", instagram:"@goldbearproductions", location:"Mexico City" },
   socials: [
@@ -687,9 +746,13 @@ function renderProcessPanel(){
   const el = document.getElementById('processPanel');
   el.innerHTML = state.process.map((p,i) => `<div class="item-card">
     <div class="field"><label>Step ${i+1} title</label><input type="text" data-i="${i}" data-f="title" class="proc-title"></div>
-    <div class="field"><label>Step ${i+1} body</label><textarea data-i="${i}" data-f="body" class="proc-body"></textarea></div></div>`).join('');
+    <div class="field"><label>Step ${i+1} body</label><textarea data-i="${i}" data-f="body" class="proc-body"></textarea></div>
+    <div class="field"><label>Step ${i+1} title (ES)</label><input type="text" data-i="${i}" data-f="title" class="proc-title-es"></div>
+    <div class="field"><label>Step ${i+1} body (ES)</label><textarea data-i="${i}" data-f="body" class="proc-body-es"></textarea></div></div>`).join('');
   el.querySelectorAll('.proc-title').forEach(inp => { inp.value = state.process[inp.dataset.i].title; inp.addEventListener('input', () => { state.process[inp.dataset.i].title = inp.value; refresh(); }); });
   el.querySelectorAll('.proc-body').forEach(inp => { inp.value = state.process[inp.dataset.i].body; inp.addEventListener('input', () => { state.process[inp.dataset.i].body = inp.value; refresh(); }); });
+  el.querySelectorAll('.proc-title-es').forEach(inp => { inp.value = state.process[inp.dataset.i].es.title; inp.addEventListener('input', () => { state.process[inp.dataset.i].es.title = inp.value; refresh(); }); });
+  el.querySelectorAll('.proc-body-es').forEach(inp => { inp.value = state.process[inp.dataset.i].es.body; inp.addEventListener('input', () => { state.process[inp.dataset.i].es.body = inp.value; refresh(); }); });
 }
 function renderRosterStepsPanel(){
   const el = document.getElementById('rosterStepsPanel');
@@ -697,16 +760,20 @@ function renderRosterStepsPanel(){
   el.innerHTML = `<div style="display:flex;flex-direction:column;gap:10px;margin:14px 0;">` + steps.map((st,i) => `<div class="item-card"><button class="remove" data-i="${i}" data-action="removeRosterStep">×</button>
     <div class="field"><label>Step ${i+1} title</label><input type="text" data-i="${i}" data-f="title" class="rp-step-f"></div>
     <div class="field"><label>Step ${i+1} body</label><textarea data-i="${i}" data-f="body" class="rp-step-f"></textarea></div>
+    <div class="field"><label>Step ${i+1} title (ES)</label><input type="text" data-i="${i}" data-f="title" class="rp-step-f-es"></div>
+    <div class="field"><label>Step ${i+1} body (ES)</label><textarea data-i="${i}" data-f="body" class="rp-step-f-es"></textarea></div>
     </div>`).join('') + `<button class="btn add-btn" id="addRosterStep">+ Add step</button></div>`;
   el.querySelectorAll('.rp-step-f').forEach(inp => { inp.value = steps[inp.dataset.i][inp.dataset.f]; inp.addEventListener('input', () => { steps[inp.dataset.i][inp.dataset.f] = inp.value; refresh(); }); });
+  el.querySelectorAll('.rp-step-f-es').forEach(inp => { if (!steps[inp.dataset.i].es) steps[inp.dataset.i].es = {title:"",body:""}; inp.value = steps[inp.dataset.i].es[inp.dataset.f] || ''; inp.addEventListener('input', () => { steps[inp.dataset.i].es[inp.dataset.f] = inp.value; refresh(); }); });
   el.querySelectorAll('[data-action=removeRosterStep]').forEach(b => b.addEventListener('click', () => { steps.splice(b.dataset.i,1); renderRosterStepsPanel(); refresh(); }));
-  document.getElementById('addRosterStep').addEventListener('click', () => { steps.push({ title:"New Step", body:"Describe what happens here." }); renderRosterStepsPanel(); refresh(); });
+  document.getElementById('addRosterStep').addEventListener('click', () => { steps.push({ title:"New Step", body:"Describe what happens here.", es:{title:"Nuevo paso", body:"Describe qué pasa aquí."} }); renderRosterStepsPanel(); refresh(); });
 }
 function renderTracksPanel(){
   const el = document.getElementById('tracksPanel');
   el.innerHTML = state.tracks.map((tr,i) => `<div class="item-card"><button class="remove" data-i="${i}" data-action="removeTrack">×</button>
     <div class="field"><label>Title</label><input type="text" data-i="${i}" data-f="title" class="tr-f"></div>
     <div class="row2"><div class="field"><label>Artist label</label><input type="text" data-i="${i}" data-f="artist" class="tr-f"></div><div class="field"><label>Tag</label><input type="text" data-i="${i}" data-f="tag" class="tr-f"></div></div>
+    <div class="field"><label>Tag (ES)</label><input type="text" data-i="${i}" class="tr-tag-es"></div>
     <div class="row2"><div class="field"><label>Duration</label><input type="text" data-i="${i}" data-f="duration" class="tr-f"></div><div class="field"><label>Direct audio URL (optional)</label><input type="text" data-i="${i}" data-f="audioUrl" class="tr-f"></div></div>
     <div class="field"><label>SoundCloud track URL (optional)</label><input type="text" data-i="${i}" data-f="soundcloudUrl" class="tr-f" placeholder="https://soundcloud.com/you/track-name"></div>
     <div class="field"><label>Spotify track/album URL (optional)</label><input type="text" data-i="${i}" data-f="spotifyUrl" class="tr-f" placeholder="https://open.spotify.com/track/..."></div>
@@ -714,8 +781,9 @@ function renderTracksPanel(){
     <div class="hint">Priority if more than one is filled in: SoundCloud → Spotify → Apple Music → direct audio file.</div>
     </div>`).join('') + `<button class="btn add-btn" id="addTrack">+ Add track</button>`;
   el.querySelectorAll('.tr-f').forEach(inp => { inp.value = state.tracks[inp.dataset.i][inp.dataset.f] || ''; inp.addEventListener('input', () => { state.tracks[inp.dataset.i][inp.dataset.f] = inp.value; refresh(); }); });
+  el.querySelectorAll('.tr-tag-es').forEach(inp => { if (!state.tracks[inp.dataset.i].es) state.tracks[inp.dataset.i].es = {tag:""}; inp.value = state.tracks[inp.dataset.i].es.tag || ''; inp.addEventListener('input', () => { state.tracks[inp.dataset.i].es.tag = inp.value; refresh(); }); });
   el.querySelectorAll('[data-action=removeTrack]').forEach(b => b.addEventListener('click', () => { state.tracks.splice(b.dataset.i,1); renderTracksPanel(); refresh(); }));
-  document.getElementById('addTrack').addEventListener('click', () => { state.tracks.push({ title:"New Track", artist:"Produced by Goldbear", tag:"Original", duration:"0:00", audioUrl:"", soundcloudUrl:"", spotifyUrl:"", appleMusicUrl:"" }); renderTracksPanel(); refresh(); });
+  document.getElementById('addTrack').addEventListener('click', () => { state.tracks.push({ title:"New Track", artist:"Produced by Goldbear", tag:"Original", duration:"0:00", audioUrl:"", soundcloudUrl:"", spotifyUrl:"", appleMusicUrl:"", es:{tag:"Original"} }); renderTracksPanel(); refresh(); });
 }
 function renderArtistsPanel(){
   const el = document.getElementById('artistsPanel');
@@ -725,9 +793,13 @@ function renderArtistsPanel(){
     <div class="field"><label>Name</label><input type="text" data-i="${i}" data-f="name" class="ar-f"></div>
     <div class="field"><label>Genre / city</label><input type="text" data-i="${i}" data-f="genre" class="ar-f"></div>
     <div class="field"><label>Bio line</label><textarea data-i="${i}" data-f="bio" class="ar-f"></textarea></div>
+    <div class="field"><label>Genre / city (ES)</label><input type="text" data-i="${i}" class="ar-genre-es"></div>
+    <div class="field"><label>Bio line (ES)</label><textarea data-i="${i}" class="ar-bio-es"></textarea></div>
     <div class="row2"><div class="field"><label>Instagram link</label><input type="text" data-i="${i}" data-f="instagram" class="ar-f"></div><div class="field"><label>Listen link</label><input type="text" data-i="${i}" data-f="listen" class="ar-f"></div></div>
     </div>`).join('') + `<button class="btn add-btn" id="addArtist">+ Add artist</button>`;
   el.querySelectorAll('.ar-f').forEach(inp => { inp.value = state.artists[inp.dataset.i][inp.dataset.f]; inp.addEventListener('input', () => { state.artists[inp.dataset.i][inp.dataset.f] = inp.value; refresh(); }); });
+  el.querySelectorAll('.ar-genre-es').forEach(inp => { if (!state.artists[inp.dataset.i].es) state.artists[inp.dataset.i].es = {genre:"",bio:""}; inp.value = state.artists[inp.dataset.i].es.genre || ''; inp.addEventListener('input', () => { state.artists[inp.dataset.i].es.genre = inp.value; refresh(); }); });
+  el.querySelectorAll('.ar-bio-es').forEach(inp => { if (!state.artists[inp.dataset.i].es) state.artists[inp.dataset.i].es = {genre:"",bio:""}; inp.value = state.artists[inp.dataset.i].es.bio || ''; inp.addEventListener('input', () => { state.artists[inp.dataset.i].es.bio = inp.value; refresh(); }); });
   el.querySelectorAll('[data-action=removeArtist]').forEach(b => b.addEventListener('click', () => { state.artists.splice(b.dataset.i,1); renderArtistsPanel(); refresh(); }));
   el.querySelectorAll('[data-artist-photo]').forEach(drop => {
     drop.addEventListener('click', () => {
@@ -738,7 +810,7 @@ function renderArtistsPanel(){
       input.click();
     });
   });
-  document.getElementById('addArtist').addEventListener('click', () => { state.artists.push({ name:"New Artist", genre:"Genre / City", bio:"One line on their sound.", instagram:"#", listen:"#", photo:"" }); renderArtistsPanel(); refresh(); });
+  document.getElementById('addArtist').addEventListener('click', () => { state.artists.push({ name:"New Artist", genre:"Genre / City", bio:"One line on their sound.", instagram:"#", listen:"#", photo:"", es:{genre:"Género / Ciudad", bio:"Una línea sobre su sonido."} }); renderArtistsPanel(); refresh(); });
 }
 function renderGearPanel(){
   const el = document.getElementById('gearPanel');
@@ -806,13 +878,22 @@ function initSidebar(){
   bindSimple('f_display','theme.displayFont'); bindSimple('f_body','theme.bodyFont'); bindSimple('f_mono','theme.monoFont');
   bindSimple('h_eyebrow','hero.eyebrow'); bindSimple('h_headline','hero.headline'); bindSimple('h_em','hero.em');
   bindSimple('h_sub','hero.sub'); bindSimple('h_cta1','hero.cta1'); bindSimple('h_cta2','hero.cta2');
+  bindSimple('h_eyebrow_es','hero.es.eyebrow'); bindSimple('h_headline_es','hero.es.headline'); bindSimple('h_em_es','hero.es.em');
+  bindSimple('h_sub_es','hero.es.sub'); bindSimple('h_cta1_es','hero.es.cta1'); bindSimple('h_cta2_es','hero.es.cta2');
   bindSimple('a_eyebrow','about.eyebrow'); bindSimple('a_heading','about.heading'); bindSimple('a_body','about.body');
+  bindSimple('a_eyebrow_es','about.es.eyebrow'); bindSimple('a_heading_es','about.es.heading'); bindSimple('a_body_es','about.es.body');
   bindSimple('g_eyebrow','gearSection.eyebrow'); bindSimple('g_heading','gearSection.heading'); bindSimple('g_body','gearSection.body');
+  bindSimple('g_eyebrow_es','gearSection.es.eyebrow'); bindSimple('g_heading_es','gearSection.es.heading'); bindSimple('g_body_es','gearSection.es.body');
   bindSimple('rp_eyebrow','rosterProcess.eyebrow'); bindSimple('rp_heading','rosterProcess.heading'); bindSimple('rp_intro','rosterProcess.intro');
   bindSimple('rp_note','rosterProcess.note'); bindSimple('rp_ctaBtn','rosterProcess.ctaBtn');
+  bindSimple('rp_eyebrow_es','rosterProcess.es.eyebrow'); bindSimple('rp_heading_es','rosterProcess.es.heading'); bindSimple('rp_intro_es','rosterProcess.es.intro');
+  bindSimple('rp_note_es','rosterProcess.es.note'); bindSimple('rp_ctaBtn_es','rosterProcess.es.ctaBtn');
   bindSimple('p1_price','pricing.perSong.price'); bindSimple('p1_sub','pricing.perSong.sub'); bindSimple('p1_btn','pricing.perSong.btn');
   bindSimple('p2_price','pricing.membership.price'); bindSimple('p2_sub','pricing.membership.sub'); bindSimple('p2_btn','pricing.membership.btn');
   bindFeatures('p1_features','pricing.perSong.features'); bindFeatures('p2_features','pricing.membership.features');
+  bindSimple('p1_sub_es','pricing.perSong.es.sub'); bindSimple('p1_btn_es','pricing.perSong.es.btn');
+  bindSimple('p2_sub_es','pricing.membership.es.sub'); bindSimple('p2_btn_es','pricing.membership.es.btn');
+  bindFeatures('p1_features_es','pricing.perSong.es.features'); bindFeatures('p2_features_es','pricing.membership.es.features');
   bindSimple('ct_email','contact.email'); bindSimple('ct_instagram','contact.instagram'); bindSimple('ct_location','contact.location');
   bindSimple('ft_text','footer.text');
   if (state.theme.logoImage) { const t = document.getElementById('logoThumb'); t.src = state.theme.logoImage; t.style.display='block'; }
@@ -854,6 +935,16 @@ function showApp(){
     if (!s.gearSection) s.gearSection = JSON.parse(JSON.stringify(defaultState.gearSection));
     if (!s.companyName) s.companyName = defaultState.companyName;
     if (!s.rosterProcess) s.rosterProcess = JSON.parse(JSON.stringify(defaultState.rosterProcess));
+    if (!s.hero.es) s.hero.es = JSON.parse(JSON.stringify(defaultState.hero.es));
+    if (!s.about.es) s.about.es = JSON.parse(JSON.stringify(defaultState.about.es));
+    if (!s.gearSection.es) s.gearSection.es = JSON.parse(JSON.stringify(defaultState.gearSection.es));
+    if (!s.rosterProcess.es) s.rosterProcess.es = JSON.parse(JSON.stringify(defaultState.rosterProcess.es));
+    (s.process||[]).forEach((p,i) => { if (!p.es) p.es = { title:p.title, body:p.body }; });
+    (s.rosterProcess.steps||[]).forEach((st,i) => { if (!st.es) st.es = { title:st.title, body:st.body }; });
+    if (!s.pricing.perSong.es) s.pricing.perSong.es = JSON.parse(JSON.stringify(defaultState.pricing.perSong.es));
+    if (!s.pricing.membership.es) s.pricing.membership.es = JSON.parse(JSON.stringify(defaultState.pricing.membership.es));
+    (s.tracks||[]).forEach(tr => { if (!tr.es) tr.es = { tag: tr.tag }; });
+    (s.artists||[]).forEach(a => { if (!a.es) a.es = { genre: a.genre, bio: a.bio }; });
     return s;
   }
   siteRef.once('value').then(snap => {
