@@ -521,7 +521,7 @@
   function detectLanguage(){
     try {
       const saved = localStorage.getItem('bb_lang');
-      if (saved === 'en' || saved === 'es') { setLanguage(saved, false); return; }
+      if (saved === 'en' || saved === 'es') { console.log('[lang] using saved preference:', saved); setLanguage(saved, false); return; }
     } catch(e){}
     // Try IP-based geolocation first (mirrors VPN region), then fall back
     // to the browser's own language setting, then default to English.
@@ -529,11 +529,24 @@
       .then(r => r.json())
       .then(data => {
         const code = (data && data.country_code) ? data.country_code.toUpperCase() : null;
-        if (code && SPANISH_COUNTRIES.has(code)) setLanguage('es', false);
+        console.log('[lang] ipwho.is detected country:', code, data);
+        if (code && SPANISH_COUNTRIES.has(code)) { setLanguage('es', false); }
+        else { console.log('[lang] country not in Spanish list, staying English'); }
       })
-      .catch(() => {
-        const nav = (navigator.language || '').toLowerCase();
-        if (nav.startsWith('es')) setLanguage('es', false);
+      .catch((err) => {
+        console.log('[lang] ipwho.is failed, trying backup provider:', err);
+        fetch('https://ipapi.co/json/')
+          .then(r => r.json())
+          .then(data => {
+            const code = (data && data.country_code) ? data.country_code.toUpperCase() : null;
+            console.log('[lang] ipapi.co detected country:', code, data);
+            if (code && SPANISH_COUNTRIES.has(code)) setLanguage('es', false);
+          })
+          .catch((err2) => {
+            console.log('[lang] both geolocation providers failed, using browser language:', err2);
+            const nav = (navigator.language || '').toLowerCase();
+            if (nav.startsWith('es')) setLanguage('es', false);
+          });
       });
   }
 
